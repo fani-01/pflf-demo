@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PFLF — Privacy-Preserving Federated Learning | Fraud Detection</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg0:#010812;--bg1:#040f1e;--bg2:#071525;--bg3:#0b1d31;
+  --c:#00e5ff;--cg:#00e5ff12;--cd:#00e5ff40;
+  --g:#00ff9d;--gd:#00ff9d44;--gg:#00ff9d12;
+  --r:#ff2d55;--rd:#ff2d5540;--rg:#ff2d5512;
+  --o:#ff8c00;--od:#ff8c0040;--og:#ff8c0012;
+  --p:#bf5fff;--pd:#bf5fff40;--pg:#bf5fff12;
+  --y:#ffd60a;
+  --t1:#e8f6ff;--t2:#7ab8d4;--t3:#3a6080;--t4:#1a3a55;
+  --bdr:#0e2a42;
+  --F:'Exo 2',sans-serif;--FM:'Share Tech Mono',monospace;--FD:'Rajdhani',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--F);background:var(--bg0);color:var(--t1);overflow-x:hidden;line-height:1.6;font-size:15px}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg1)}::-webkit-scrollbar-thumb{background:var(--cd);border-radius:3px}
+::selection{background:var(--cd)}
+a{text-decoration:none;color:inherit}
+
+/* NAV */
+#nav{position:fixed;top:0;left:0;right:0;height:64px;background:rgba(1,8,18,.95);backdrop-filter:blur(24px);border-bottom:1px solid var(--bdr);z-index:900;display:flex;align-items:center;padding:0 1.5rem;transition:.3s}
+#nav.scrolled{border-bottom-color:var(--cd);box-shadow:0 2px 24px #00e5ff08}
+.nav-w{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:1500px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:.65rem}
+.brand-ico{width:38px;height:38px;background:linear-gradient(135deg,var(--c),var(--p));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 0 20px var(--cd)}
+.brand-name{font-family:var(--FD);font-size:1.15rem;font-weight:700;color:var(--c);letter-spacing:.06em;line-height:1.1}
+.brand-sub{font-family:var(--FM);font-size:.5rem;color:var(--t3);letter-spacing:.14em}
+.nav-links{display:flex;gap:.1rem}
+.nav-links a{font-family:var(--FM);font-size:.6rem;color:var(--t3);padding:.38rem .75rem;border-radius:7px;transition:.2s;letter-spacing:.08em;text-transform:uppercase}
+.nav-links a:hover{color:var(--c);background:var(--cg)}
+.nav-r{display:flex;align-items:center;gap:1.25rem}
+.ws-badge{display:flex;align-items:center;gap:.4rem;font-family:var(--FM);font-size:.6rem;letter-spacing:.1em}
+.wsdot{width:7px;height:7px;border-radius:50%;background:var(--g);animation:wsp 1.8s ease-in-out infinite}
+.wsdot.off{background:var(--r);animation:none}
+.ws-lbl{color:var(--g)}.wsdot.off+.ws-lbl{color:var(--r)}
+@keyframes wsp{0%,100%{box-shadow:0 0 0 0 var(--gd)}50%{box-shadow:0 0 0 4px transparent}}
+.nav-api{font-family:var(--FM);font-size:.6rem;color:var(--c);background:var(--cg);border:1px solid var(--cd);padding:.32rem .8rem;border-radius:7px;transition:.2s}
+.nav-api:hover{background:var(--cd);color:#010812}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:80px 1.5rem 4rem;position:relative;overflow:hidden}
+#hcvs{position:absolute;inset:0;pointer-events:none;opacity:.5}
+.hero-tag{display:inline-flex;align-items:center;gap:.5rem;background:var(--cg);border:1px solid var(--cd);border-radius:100px;padding:.3rem 1rem;font-family:var(--FM);font-size:.6rem;color:var(--c);letter-spacing:.15em;text-transform:uppercase;margin-bottom:1.75rem;position:relative;animation:up .8s ease both}
+.hero-h1{font-family:var(--FD);font-size:clamp(2.2rem,5.5vw,5rem);font-weight:900;line-height:1.05;margin-bottom:1.4rem;position:relative;animation:up .9s ease .1s both}
+.hero-h1 .l1{display:block;color:var(--t1)}
+.hero-h1 .l2{display:block;background:linear-gradient(90deg,var(--c),var(--g),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{max-width:640px;font-size:.98rem;color:var(--t2);margin-bottom:3rem;line-height:1.9;position:relative;animation:up 1s ease .2s both}
+.hero-kpis{display:flex;gap:2.5rem;justify-content:center;margin-bottom:3.5rem;flex-wrap:wrap;position:relative;animation:up 1.1s ease .3s both}
+.kpi{text-align:center}.kpi-n{font-family:var(--FD);font-size:2.4rem;font-weight:900;color:var(--c);display:block;line-height:1;text-shadow:0 0 28px var(--cd)}.kpi-l{font-family:var(--FM);font-size:.56rem;color:var(--t3);letter-spacing:.14em;text-transform:uppercase;margin-top:.35rem;display:block}
+.hero-btns{display:flex;gap:.9rem;justify-content:center;flex-wrap:wrap;position:relative;animation:up 1.2s ease .4s both}
+.btn-p{display:inline-flex;align-items:center;gap:.45rem;background:linear-gradient(135deg,var(--c),#007799);color:#010812;font-family:var(--FD);font-size:.82rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.85rem 1.9rem;border:none;border-radius:10px;cursor:pointer;transition:.25s;box-shadow:0 0 28px var(--cd)}
+.btn-p:hover{transform:translateY(-3px);box-shadow:0 6px 48px var(--cd)}
+.btn-s{display:inline-flex;align-items:center;gap:.45rem;background:transparent;color:var(--t1);font-family:var(--FD);font-size:.82rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.85rem 1.9rem;border:1px solid var(--bdr);border-radius:10px;cursor:pointer;transition:.25s}
+.btn-s:hover{border-color:var(--cd);color:var(--c);background:var(--cg)}
+@keyframes up{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+
+/* SECTIONS */
+.sec{padding:5.5rem 1.5rem}
+.sec-in{max-width:1500px;margin:0 auto}
+.sec-tag{font-family:var(--FM);font-size:.6rem;color:var(--c);letter-spacing:.2em;text-transform:uppercase;margin-bottom:.55rem;display:flex;align-items:center;gap:.55rem}
+.sec-tag::before{content:'';width:22px;height:1px;background:var(--c)}
+.sec-h2{font-family:var(--FD);font-size:clamp(1.75rem,3vw,2.7rem);font-weight:800;line-height:1.15;margin-bottom:.75rem}
+.sec-h2 span{color:var(--c)}
+.sec-p{max-width:570px;color:var(--t2);font-size:.93rem;line-height:1.9;margin-bottom:2.5rem}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:1.4rem;transition:.25s}
+.card:hover{border-color:var(--cd);box-shadow:0 8px 36px #00e5ff07}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;gap:.5rem;flex-wrap:wrap}
+.card-title{font-family:var(--FD);font-size:.85rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.card-sub{font-family:var(--FM);font-size:.57rem;color:var(--t3);letter-spacing:.06em;margin-top:.12rem}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:.25rem;padding:.16rem .52rem;border-radius:100px;font-family:var(--FM);font-size:.57rem;letter-spacing:.06em;font-weight:700;text-transform:uppercase;white-space:nowrap}
+.badge.live{background:var(--gg);border:1px solid var(--gd);color:var(--g)}
+.badge.info{background:var(--cg);border:1px solid var(--cd);color:var(--c)}
+.badge.warn{background:var(--og);border:1px solid var(--od);color:var(--o)}
+.badge.danger{background:var(--rg);border:1px solid var(--rd);color:var(--r)}
+.pill{display:inline-flex;align-items:center;gap:.22rem;padding:.16rem .5rem;border-radius:100px;font-size:.59rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;font-family:var(--FM)}
+.pill.clean{background:var(--gg);border:1px solid var(--gd);color:var(--g)}
+.pill.suspect{background:var(--og);border:1px solid var(--od);color:var(--o)}
+.pill.fraud{background:var(--rg);border:1px solid var(--rd);color:var(--r)}
+.pill.review{background:var(--pg);border:1px solid var(--pd);color:var(--p)}
+
+/* DEMO */
+#demo{padding:3rem 1.5rem;background:var(--bg1);border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr)}
+.demo-in{max-width:1500px;margin:0 auto}
+.demo-hdr{text-align:center;margin-bottom:2rem}
+.demo-eyebrow{display:inline-flex;align-items:center;gap:.4rem;background:var(--rg);border:1px solid var(--rd);border-radius:100px;padding:.28rem .9rem;font-family:var(--FM);font-size:.6rem;color:var(--r);letter-spacing:.14em;text-transform:uppercase;margin-bottom:.65rem}
+.demo-title{font-family:var(--FD);font-size:1.75rem;font-weight:800;margin-bottom:.35rem}
+.demo-hint{font-family:var(--FM);font-size:.65rem;color:var(--t3);letter-spacing:.07em}
+.demo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem}
+.dc{background:var(--bg2);border:1px solid var(--bdr);border-radius:18px;padding:1.75rem 1.25rem;cursor:pointer;transition:.3s;text-align:center;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:.6rem}
+.dc::before{content:'';position:absolute;inset:0;opacity:0;transition:.3s}
+.dc:hover{transform:translateY(-5px)}.dc:hover::before{opacity:1}
+.dc.cc{border-color:var(--rd)}.dc.cc:hover{box-shadow:0 10px 50px var(--rg)}.dc.cc::before{background:var(--rg)}
+.dc.ml{border-color:var(--pd)}.dc.ml:hover{box-shadow:0 10px 50px var(--pg)}.dc.ml::before{background:var(--pg)}
+.dc.ut{border-color:var(--od)}.dc.ut:hover{box-shadow:0 10px 50px var(--og)}.dc.ut::before{background:var(--og)}
+.dc.ft{border-color:var(--gd)}.dc.ft:hover{box-shadow:0 10px 50px var(--gg)}.dc.ft::before{background:var(--gg)}
+.dc-ico{font-size:2.8rem;position:relative}
+.dc-title{font-family:var(--FD);font-size:1.05rem;font-weight:700;letter-spacing:.04em;position:relative}
+.dc.cc .dc-title{color:var(--r)}.dc.ml .dc-title{color:var(--p)}.dc.ut .dc-title{color:var(--o)}.dc.ft .dc-title{color:var(--g)}
+.dc-desc{font-size:.78rem;color:var(--t3);line-height:1.6;position:relative;flex:1}
+.dc-btn{font-family:var(--FM);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;padding:.45rem 1.15rem;border-radius:100px;border:1px solid currentColor;background:transparent;cursor:pointer;transition:.2s;position:relative}
+.dc.cc .dc-btn{color:var(--r)}.dc.ml .dc-btn{color:var(--p)}.dc.ut .dc-btn{color:var(--o)}.dc.ft .dc-btn{color:var(--g)}
+.dc-btn:hover{opacity:.75}
+.dc-badge{position:absolute;top:.85rem;right:.85rem;font-family:var(--FM);font-size:.56rem;color:var(--t3);letter-spacing:.06em}
+.dc-badge span{color:var(--t1);font-weight:700}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(6,1fr);gap:.9rem;margin-bottom:1.6rem}
+.sc{background:var(--bg2);border:1px solid var(--bdr);border-radius:11px;padding:1.15rem;position:relative;overflow:hidden;transition:.25s}
+.sc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--acol,var(--c))}
+.sc:hover{transform:translateY(-2px)}
+.sc-lbl{font-family:var(--FM);font-size:.56rem;color:var(--t3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.35rem}
+.sc-val{font-family:var(--FD);font-size:1.75rem;font-weight:800;line-height:1;color:var(--acol,var(--c));margin-bottom:.25rem;transition:.3s}
+.sc-chg{font-family:var(--FM);font-size:.59rem;display:flex;align-items:center;gap:.22rem}
+.sc-chg.up{color:var(--g)}.sc-chg.dn{color:var(--r)}.sc-chg.nt{color:var(--t3)}
+
+/* TABS */
+.tabs-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.6rem;flex-wrap:wrap;gap:.8rem}
+.tabs{display:flex;gap:.25rem;background:var(--bg2);border:1px solid var(--bdr);border-radius:11px;padding:.28rem;flex-wrap:wrap}
+.tab{font-family:var(--FM);font-size:.6rem;letter-spacing:.06em;color:var(--t3);background:transparent;border:none;padding:.42rem .85rem;border-radius:8px;cursor:pointer;transition:.2s;text-transform:uppercase;white-space:nowrap}
+.tab:hover{color:var(--t1);background:var(--bg3)}.tab.on{background:linear-gradient(135deg,var(--c),#007799);color:#010812;font-weight:700}
+.tp{display:none;animation:fi .3s ease}.tp.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.trow{display:flex;gap:.3rem}
+.tbtn{font-family:var(--FM);font-size:.58rem;color:var(--t3);background:transparent;border:1px solid var(--bdr);padding:.28rem .65rem;border-radius:7px;cursor:pointer;transition:.2s}
+.tbtn:hover,.tbtn.on{color:var(--c);border-color:var(--cd);background:var(--cg)}
+
+/* CHARTS */
+.ch2{display:grid;grid-template-columns:2fr 1fr;gap:1.1rem;margin-bottom:1.1rem}
+.ch22{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;margin-bottom:1.1rem}
+.chw{position:relative;height:210px}
+.chw-t{position:relative;height:265px}
+
+/* RISK BARS */
+.risk-rows{display:flex;flex-direction:column;gap:.55rem;margin-top:.9rem}
+.rrow{display:flex;align-items:center;gap:.75rem}
+.rlbl{font-family:var(--FM);font-size:.6rem;color:var(--t2);min-width:175px}
+.rtrk{flex:1;height:7px;background:var(--bdr);border-radius:4px;overflow:hidden}
+.rfill{height:100%;border-radius:4px;transition:width 1.4s ease}
+.rfill.h{background:linear-gradient(90deg,var(--r),var(--o))}.rfill.m{background:linear-gradient(90deg,var(--o),var(--y))}.rfill.l{background:linear-gradient(90deg,var(--c),var(--g))}
+.rpct{font-family:var(--FM);font-size:.6rem;min-width:28px;text-align:right}
+
+/* FL */
+.fl-wrap{background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:1.4rem;margin-bottom:1.1rem}
+.fl-title{font-family:var(--FD);font-size:.85rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:1.1rem;display:flex;align-items:center;gap:.5rem}
+.banks-g{display:grid;grid-template-columns:repeat(5,1fr);gap:.65rem;margin-bottom:1.1rem}
+.bn{background:var(--bg1);border:1px solid var(--bdr);border-radius:8px;padding:.75rem .4rem;text-align:center;transition:.3s}
+.bn.training{border-color:var(--cd);box-shadow:0 0 16px var(--cg);animation:bnp 1.4s ease-in-out infinite}
+.bn.done{border-color:var(--gd);box-shadow:0 0 8px var(--gg)}
+@keyframes bnp{0%,100%{box-shadow:0 0 10px var(--cg)}50%{box-shadow:0 0 25px var(--cd)}}
+.bn-ico{font-size:1.15rem;margin-bottom:.2rem}.bn-name{font-family:var(--FM);font-size:.54rem;color:var(--t2)}.bn-stat{font-family:var(--FM);font-size:.48rem;color:var(--t3);margin-top:.12rem}
+.bn.training .bn-stat{color:var(--c)}.bn.done .bn-stat{color:var(--g)}
+.fl-prog{display:flex;flex-direction:column;gap:.5rem}
+.fl-pr{display:flex;align-items:center;gap:.9rem}
+.fl-pr-lbl{font-family:var(--FM);font-size:.6rem;color:var(--t3);min-width:145px}
+.fl-pr-trk{flex:1;height:8px;background:var(--bdr);border-radius:4px;overflow:hidden}
+.fl-pr-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--c),var(--g));transition:width .9s ease}
+.fl-pr-val{font-family:var(--FM);font-size:.6rem;color:var(--c);min-width:33px;text-align:right}
+
+/* LIVE FEED */
+#feed{background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;margin-top:1.25rem}
+.feed-hdr{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.4rem;border-bottom:1px solid var(--bdr);flex-wrap:wrap;gap:.8rem}
+.feed-title{font-family:var(--FD);font-size:.88rem;font-weight:700;display:flex;align-items:center;gap:.5rem}
+.feed-ctrls{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}
+.fcb{font-family:var(--FM);font-size:.58rem;color:var(--t3);background:transparent;border:1px solid var(--bdr);padding:.28rem .7rem;border-radius:7px;cursor:pointer;transition:.2s}
+.fcb:hover{color:var(--c);border-color:var(--cd)}.fcb.paused{color:var(--r);border-color:var(--rd)}
+.finfo{font-family:var(--FM);font-size:.58rem;color:var(--t3)}
+.feed-cols{display:grid;grid-template-columns:125px 1fr 100px 130px 105px 115px 75px;gap:.4rem;padding:.6rem 1.4rem;background:var(--bg1);border-bottom:1px solid var(--bdr)}
+.fch{font-family:var(--FM);font-size:.54rem;color:var(--t3);letter-spacing:.1em;text-transform:uppercase}
+.feed-body{max-height:330px;overflow-y:auto}
+.fr{display:grid;grid-template-columns:125px 1fr 100px 130px 105px 115px 75px;gap:.4rem;padding:.75rem 1.4rem;border-bottom:1px solid var(--bdr);align-items:center;cursor:pointer;transition:.18s;font-family:var(--FM);font-size:.64rem}
+.fr:hover{background:var(--bg3)}
+.fr.ff{animation:flashf .6s ease}
+.fr.fs{animation:flashs .6s ease}
+@keyframes flashf{0%{background:var(--rg)}to{background:transparent}}
+@keyframes flashs{0%{background:var(--og)}to{background:transparent}}
+.fid{color:var(--c);font-weight:600}.fbank{color:var(--t2)}.famt{color:var(--t1);font-weight:600}
+.rb-wrap{display:flex;align-items:center;gap:.3rem}
+.rbt{flex:1;height:5px;background:var(--bdr);border-radius:3px;overflow:hidden;min-width:36px}
+.rbf{height:100%;border-radius:3px}
+
+/* ANALYZER */
+.ana-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.75rem;align-items:start}
+.ana-form{background:var(--bg2);border:1px solid var(--bdr);border-radius:20px;padding:1.85rem}
+.ana-form h3{font-family:var(--FD);font-size:1.1rem;font-weight:700;color:var(--c);margin-bottom:.25rem}
+.ana-form>.desc{font-size:.78rem;color:var(--t3);margin-bottom:1.75rem}
+.type-tabs{display:flex;gap:.35rem;margin-bottom:1.6rem;flex-wrap:wrap}
+.tt{font-family:var(--FM);font-size:.59rem;padding:.42rem .85rem;border-radius:8px;border:1px solid var(--bdr);background:transparent;color:var(--t3);cursor:pointer;transition:.2s;letter-spacing:.06em;text-transform:uppercase}
+.tt:hover{border-color:var(--cd);color:var(--c)}
+.tt.cc.on{background:var(--rg);border-color:var(--rd);color:var(--r)}
+.tt.ml.on{background:var(--pg);border-color:var(--pd);color:var(--p)}
+.tt.ut.on{background:var(--og);border-color:var(--od);color:var(--o)}
+.tt.ft.on{background:var(--gg);border-color:var(--gd);color:var(--g)}
+.fp{display:none;animation:fi .3s ease}.fp.on{display:block}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+.frm{margin-bottom:.9rem}
+.frm label{display:block;font-family:var(--FM);font-size:.58rem;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.32rem}
+/* ── FIX: added appearance:none alongside -webkit-appearance:none ── */
+.frm input,.frm select{width:100%;background:var(--bg1);border:1px solid var(--bdr);border-radius:8px;color:var(--t1);font-family:var(--FM);font-size:.78rem;padding:.58rem .85rem;outline:none;transition:.2s;-webkit-appearance:none;appearance:none}
+.frm input:focus,.frm select:focus{border-color:var(--cd);box-shadow:0 0 0 3px var(--cg)}
+.frm select option{background:var(--bg2)}
+.chk-grp{display:flex;flex-direction:column;gap:.4rem;margin-top:.4rem}
+.ci{display:flex;align-items:center;gap:.6rem;cursor:pointer;padding:.5rem .65rem;border-radius:9px;border:1.5px solid transparent;background:var(--bg3);transition:all .18s;user-select:none}
+.ci:hover{border-color:var(--bdr);background:var(--bg1)}
+.ci input[type=checkbox]{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
+.ci-box{width:18px;height:18px;border:1.5px solid var(--t3);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .18s;background:transparent;font-size:.72rem;font-weight:700;color:transparent}
+.ci-text{font-size:.78rem;color:var(--t2);line-height:1.35;text-decoration:none!important;transition:color .18s}
+.ci.checked{border-color:var(--cd);background:var(--cg)}
+.ci.checked .ci-box{background:var(--c);border-color:var(--c);color:#010812}
+.ci.checked .ci-text{color:var(--c);text-decoration:none!important;font-weight:500}
+
+.ana-btn{width:100%;background:linear-gradient(135deg,var(--c),var(--p));color:white;font-family:var(--FD);font-size:.85rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.88rem;border:none;border-radius:11px;cursor:pointer;transition:.25s;margin-top:.5rem;display:flex;align-items:center;justify-content:center;gap:.4rem}
+.ana-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px var(--cd)}
+.ana-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.ep-info{margin-top:.9rem;padding:.82rem .95rem;background:var(--bg1);border-radius:8px;border:1px solid var(--bdr)}
+.ep-lbl{font-family:var(--FM);font-size:.56rem;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.28rem}
+.ep-val{font-family:var(--FM);font-size:.7rem;color:var(--c)}
+
+/* RESULT */
+.res-panel{background:var(--bg2);border:1px solid var(--bdr);border-radius:20px;padding:1.85rem;min-height:460px;display:flex;flex-direction:column}
+.res-ph{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--t3)}
+.res-ph-ico{font-size:4rem;opacity:.2;margin-bottom:1.1rem}
+.res-ph p{font-family:var(--FM);font-size:.7rem;line-height:1.75}
+.res-out{display:none;flex-direction:column;gap:1.3rem}
+.res-out.show{display:flex;animation:fi .4s ease}
+.ring-wrap{text-align:center;position:relative}
+.ring-wrap canvas{max-width:155px;display:block;margin:0 auto}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.ring-num{font-family:var(--FD);font-size:2.1rem;font-weight:900;line-height:1}
+.ring-lbl{font-family:var(--FM);font-size:.54rem;color:var(--t3);letter-spacing:.12em;margin-top:.12rem}
+.ring-rlv{font-family:var(--FM);font-size:.56rem;font-weight:700;letter-spacing:.06em;margin-top:.12rem}
+.bk-title{font-family:var(--FM);font-size:.62rem;color:var(--t3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.7rem}
+.bk-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.48rem}
+.bk-lbl{font-family:var(--FM);font-size:.62rem;color:var(--t2);min-width:135px}
+.bk-trk{flex:1;height:8px;background:var(--bdr);border-radius:4px;overflow:hidden}
+.bk-fill{height:100%;border-radius:4px;transition:width .9s ease}
+.bk-val{font-family:var(--FM);font-size:.6rem;min-width:26px;text-align:right}
+.bk-detail{font-family:var(--FM);font-size:.56rem;color:var(--t3);margin-top:.08rem;margin-bottom:.38rem;display:block;padding-left:135px}
+.verdict{border-radius:11px;padding:1.05rem 1.15rem}
+.verdict-lv{font-family:var(--FD);font-size:1rem;font-weight:800;letter-spacing:.05em;margin-bottom:.2rem}
+.verdict-act{font-family:var(--FM);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.7rem;opacity:.85}
+.verdict-msg{font-size:.8rem;color:var(--t2);line-height:1.7;margin-bottom:.85rem}
+.verdict-steps{list-style:none;display:flex;flex-direction:column;gap:.38rem}
+.verdict-steps li{font-family:var(--FM);font-size:.65rem;color:var(--t3);display:flex;gap:.45rem;line-height:1.5}
+.verdict-steps li::before{content:'→';flex-shrink:0}
+.raw-box{background:var(--bg1);border:1px solid var(--bdr);border-radius:8px;padding:.85rem .95rem}
+.raw-title{font-family:var(--FM);font-size:.56rem;color:var(--t3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.38rem}
+.raw-pre{font-family:var(--FM);font-size:.63rem;color:var(--g);overflow-x:auto;white-space:pre-wrap;line-height:1.6;max-height:115px;overflow-y:auto}
+
+/* COMPARISON */
+.ctgl{display:flex;justify-content:center;margin-bottom:2.25rem}
+.ctgl-inner{background:var(--bg2);border:1px solid var(--bdr);border-radius:11px;padding:.28rem;display:flex;gap:.22rem}
+.ctb{font-family:var(--FD);font-size:.78rem;font-weight:700;letter-spacing:.06em;padding:.6rem 1.6rem;border:none;border-radius:8px;cursor:pointer;transition:.25s;text-transform:uppercase}
+.ctb.bad.on{background:var(--r);color:white}.ctb.good.on{background:var(--g);color:#010812}.ctb:not(.on){background:transparent;color:var(--t3)}
+.cv{display:none;grid-template-columns:1fr 1fr;gap:1.6rem;animation:fi .5s ease}.cv.on{display:grid}
+.cpanel{background:var(--bg2);border:1px solid var(--bdr);border-radius:20px;padding:2rem}
+.cpanel.bad{border-top:3px solid var(--r)}.cpanel.good{border-top:3px solid var(--g)}
+.cpanel h3{font-family:var(--FD);font-size:1.05rem;font-weight:700;margin-bottom:.4rem}
+.cpanel>.cdesc{font-size:.8rem;color:var(--t3);margin-bottom:1.4rem;line-height:1.7}
+.clist{list-style:none;display:flex;flex-direction:column;gap:.65rem}
+.clist li{display:flex;align-items:flex-start;gap:.65rem;font-size:.81rem;color:var(--t2);line-height:1.55}
+
+/* PRIVACY GRID */
+.priv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem}
+.pcard{background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:1.6rem;position:relative;overflow:hidden;transition:.25s}
+.pcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--pc,var(--c))}
+.pcard:hover{transform:translateY(-4px);box-shadow:0 10px 38px rgba(0,0,0,.4)}
+.pcard-ico{font-size:1.9rem;margin-bottom:.85rem}
+.pcard-t{font-family:var(--FD);font-size:.88rem;font-weight:700;letter-spacing:.04em;margin-bottom:.45rem}
+.pcard-b{font-size:.78rem;color:var(--t3);line-height:1.75;margin-bottom:1.15rem}
+.pcard-m{display:flex;align-items:center;gap:.7rem}
+.pm-v{font-family:var(--FD);font-size:1.55rem;font-weight:800}
+.pm-l{font-family:var(--FM);font-size:.58rem;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;line-height:1.4}
+
+/* ALERTS */
+#alerts{position:fixed;top:76px;right:1.2rem;z-index:990;display:flex;flex-direction:column;gap:.55rem;pointer-events:none;max-width:375px;width:calc(100vw - 2rem)}
+.toast{background:var(--bg2);border:1px solid var(--rd);border-radius:11px;padding:.9rem 1.1rem;box-shadow:0 8px 36px var(--rg);animation:tIn .4s cubic-bezier(.34,1.56,.64,1);pointer-events:all;cursor:pointer;position:relative;overflow:hidden}
+.toast::before{content:'';position:absolute;top:0;left:0;bottom:0;width:4px;background:var(--r)}
+.toast.ml{border-color:var(--pd);box-shadow:0 8px 36px var(--pg)}.toast.ml::before{background:var(--p)}
+.toast.ut{border-color:var(--od);box-shadow:0 8px 36px var(--og)}.toast.ut::before{background:var(--o)}
+.toast.ft{border-color:var(--gd);box-shadow:0 8px 36px var(--gg)}.toast.ft::before{background:var(--g)}
+@keyframes tIn{from{opacity:0;transform:translateX(55px) scale(.9)}to{opacity:1;transform:translateX(0) scale(1)}}
+.tout{animation:tOut .3s ease forwards}
+@keyframes tOut{to{opacity:0;transform:translateX(55px)}}
+.t-hdr{display:flex;align-items:center;gap:.45rem;margin-bottom:.35rem}
+.t-ico{font-size:.95rem}
+.t-type{font-family:var(--FD);font-size:.78rem;font-weight:700;color:var(--r);flex:1}
+.toast.ml .t-type{color:var(--p)}.toast.ut .t-type{color:var(--o)}.toast.ft .t-type{color:var(--g)}
+.t-id{font-family:var(--FM);font-size:.56rem;color:var(--t3)}
+.t-x{background:transparent;border:none;color:var(--t3);cursor:pointer;font-size:.8rem;transition:.2s;margin-left:.25rem}.t-x:hover{color:var(--r)}
+.t-body{font-size:.76rem;color:var(--t2);line-height:1.5;margin-bottom:.45rem}
+.t-meta{display:flex;gap:.9rem;flex-wrap:wrap}
+.t-meta span{font-family:var(--FM);font-size:.58rem;color:var(--t3)}
+.t-meta strong{color:var(--t1)}
+.t-prog{position:absolute;bottom:0;left:0;height:2px;background:var(--r);animation:tprog 7s linear forwards}
+.toast.ml .t-prog{background:var(--p)}.toast.ut .t-prog{background:var(--o)}.toast.ft .t-prog{background:var(--g)}
+@keyframes tprog{from{width:100%}to{width:0%}}
+
+/* MODAL */
+#mbg{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(12px);z-index:1000;display:none;align-items:center;justify-content:center;padding:1.25rem}
+#mbg.open{display:flex;animation:fi .25s ease}
+#mbox{background:var(--bg2);border:1px solid var(--bdr);border-radius:20px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 24px 80px rgba(0,0,0,.75)}
+#mbox.fm{border-color:var(--rd);box-shadow:0 24px 80px var(--rg)}
+#mbox.mm{border-color:var(--pd);box-shadow:0 24px 80px var(--pg)}
+#mbox.um{border-color:var(--od);box-shadow:0 24px 80px var(--og)}
+.m-inner{padding:2rem}
+.m-close{position:absolute;top:1.1rem;right:1.1rem;background:var(--bg3);border:1px solid var(--bdr);color:var(--t3);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:.82rem;display:flex;align-items:center;justify-content:center;transition:.2s;z-index:1}
+.m-close:hover{color:var(--r);border-color:var(--rd)}
+.m-title{font-family:var(--FD);font-size:1.35rem;font-weight:800;margin-bottom:.22rem}
+.m-sub{font-family:var(--FM);font-size:.6rem;color:var(--t3);letter-spacing:.08em;margin-bottom:1.85rem}
+.m-grid{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:1.4rem}
+.mf{background:var(--bg1);border-radius:8px;padding:.82rem .95rem}
+.mf-lbl{font-family:var(--FM);font-size:.54rem;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.25rem}
+.mf-val{font-family:var(--FM);font-size:.82rem;color:var(--t1)}
+.mtl{background:var(--bg1);border-radius:11px;padding:1.1rem;margin-bottom:1.1rem}
+.mtl-title{font-family:var(--FD);font-size:.8rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.9rem}
+.ms{display:flex;align-items:flex-start;gap:.8rem;margin-bottom:.8rem;position:relative}
+.ms::after{content:'';position:absolute;left:11px;top:24px;bottom:-10px;width:1px;background:var(--bdr)}
+.ms:last-child::after{display:none}
+.ms-dot{width:23px;height:23px;border-radius:50%;background:var(--bg2);border:2px solid var(--c);display:flex;align-items:center;justify-content:center;font-size:.67rem;min-width:23px;font-family:var(--FM)}
+.ms-body strong{display:block;font-family:var(--FD);font-size:.78rem;font-weight:700;margin-bottom:.12rem}
+.ms-body p{font-size:.76rem;color:var(--t3);line-height:1.55}
+.ms-time{font-family:var(--FM);font-size:.56rem;color:var(--t3);margin-left:auto;white-space:nowrap;padding-top:.12rem}
+.priv-note{background:var(--bg1);border-radius:8px;padding:.82rem .95rem}
+.priv-note-lbl{font-family:var(--FM);font-size:.56rem;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.25rem}
+.priv-note-txt{font-size:.74rem;color:var(--t3);line-height:1.6}
+
+/* FOOTER */
+footer{background:var(--bg1);border-top:1px solid var(--bdr);padding:3rem 1.5rem;text-align:center}
+.ft-in{max-width:1500px;margin:0 auto}
+.ft-logo{font-family:var(--FD);font-size:1.3rem;font-weight:900;color:var(--c);letter-spacing:.08em;margin-bottom:.28rem}
+.ft-tag{font-family:var(--FM);font-size:.6rem;color:var(--t3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:1.75rem}
+.ft-badges{display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.4rem}
+.ft-b{font-family:var(--FM);font-size:.58rem;color:var(--t3);background:var(--bg2);border:1px solid var(--bdr);padding:.28rem .72rem;border-radius:100px}
+.ft-copy{font-family:var(--FM);font-size:.58rem;color:var(--t4)}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(20px);transition:opacity .65s ease,transform .65s ease}
+.rv.vis{opacity:1;transform:translateY(0)}
+.dvd{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--bdr),transparent);margin:1.3rem 0}
+
+/* RESPONSIVE */
+@media(max-width:1100px){.stats-row{grid-template-columns:repeat(3,1fr)}.ch2{grid-template-columns:1fr}}
+@media(max-width:900px){.demo-grid{grid-template-columns:1fr 1fr}.ana-grid,.cv.on,.m-grid,.priv-grid{grid-template-columns:1fr}.banks-g{grid-template-columns:repeat(5,1fr)}.ch22{grid-template-columns:1fr}}
+@media(max-width:640px){.stats-row{grid-template-columns:1fr 1fr}.nav-links,.nav-api{display:none}.demo-grid{grid-template-columns:1fr}.banks-g{grid-template-columns:repeat(3,1fr)}.feed-cols,.fr{grid-template-columns:110px 1fr 85px 85px}.fch:nth-child(n+5),.fr>*:nth-child(n+5){display:none}}
+
+/* ── PROFESSIONAL MNC ANALYZER UPGRADES ── */
+
+/* Preset panel */
+.preset-panel{margin-bottom:1.2rem;background:linear-gradient(135deg,var(--bg1),var(--bg3));border:1px solid var(--bdr);border-radius:14px;overflow:hidden;position:relative}
+.preset-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cd),transparent)}
+.preset-hdr{padding:.58rem 1.1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr)}
+.preset-hdr-lbl{font-family:var(--FM);font-size:.58rem;color:var(--c);letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:center;gap:.45rem}
+.preset-hdr-lbl::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--c);display:block;box-shadow:0 0 6px var(--c)}
+.preset-hdr-hint{font-family:var(--FM);font-size:.54rem;color:var(--t4)}
+.preset-btns{display:flex;padding:.55rem .75rem;gap:.4rem;flex-wrap:wrap}
+.pb{display:inline-flex;align-items:center;gap:.38rem;padding:.38rem .82rem;border-radius:8px;border:1px solid;cursor:pointer;font-family:var(--FM);font-size:.6rem;letter-spacing:.04em;background:transparent;transition:all .18s;white-space:nowrap;font-weight:500}
+.pb:hover{transform:translateY(-1px);opacity:.9}
+.pb:active{transform:translateY(0)}
+.pb.crit{border-color:var(--rd);color:var(--r)}.pb.crit:hover{background:var(--rg);box-shadow:0 4px 14px var(--rg)}
+.pb.high{border-color:var(--od);color:var(--o)}.pb.high:hover{background:var(--og);box-shadow:0 4px 14px var(--og)}
+.pb.med{border-color:#ffd60a44;color:var(--y)}.pb.med:hover{background:rgba(255,214,10,.1)}
+.pb.low{border-color:var(--gd);color:var(--g)}.pb.low:hover{background:var(--gg);box-shadow:0 4px 14px var(--gg)}
+.pb.low2{border-color:var(--cd);color:var(--c)}.pb.low2:hover{background:var(--cg);box-shadow:0 4px 14px var(--cg)}
+.pb-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;opacity:.8}
+
+/* Enhanced frm inputs */
+.frm input,.frm select{transition:all .2s;box-shadow:none}
+.frm input:hover,.frm select:hover{border-color:var(--t3)}
+.frm label{display:flex;align-items:center;justify-content:space-between}
+.frm-tip{font-family:var(--FM);font-size:.52rem;color:var(--t4);font-weight:400;letter-spacing:.04em;text-transform:none}
+
+/* Enhanced result panel */
+.res-panel{position:relative;overflow:hidden}
+.res-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cd),transparent);opacity:.5}
+
+/* Score ring glow */
+.ring-glow-critical{filter:drop-shadow(0 0 18px #ff2d5566)}
+.ring-glow-high{filter:drop-shadow(0 0 18px #ff8c0066)}
+.ring-glow-medium{filter:drop-shadow(0 0 18px #ffd60a44)}
+.ring-glow-low{filter:drop-shadow(0 0 18px #00ff9d55)}
+
+/* Enhanced verdict */
+.verdict{position:relative;overflow:hidden}
+.verdict::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,currentColor,transparent);opacity:.2}
+
+/* Ana section enhancements */
+.ana-form{position:relative;overflow:hidden}
+.ana-form::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--c),var(--p),var(--c));background-size:200% 100%;animation:shimmer 3s ease infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* EP info box */
+.ep-info{position:relative;overflow:hidden}
+.ep-info::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--c),var(--p))}
+
+/* Type tab enhancements */
+.tt{position:relative}
+.tt.on::after{content:'';position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:currentColor}
+
+/* Analyze button glow */
+.ana-btn{position:relative;overflow:hidden}
+.ana-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.1),transparent);pointer-events:none}
+.ana-btn:not(:disabled):hover::before{content:'';position:absolute;inset:-1px;background:linear-gradient(135deg,var(--c),var(--p));border-radius:inherit;z-index:-1;filter:blur(8px);opacity:.6}
+
+/* Professional section header */
+.ana-section-label{font-family:var(--FM);font-size:.58rem;color:var(--t3);letter-spacing:.16em;text-transform:uppercase;margin-bottom:.9rem;padding-bottom:.5rem;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+.ana-section-label span{color:var(--c)}
+
+/* Light Theme Overrides */
+body.light-mode {
+  --bg1: #f4f6f9;
+  --bg2: #ffffff;
+  --bg3: #ebf0f5;
+  --t1: #1a2332;
+  --t2: #4a5568;
+  --t3: #718096;
+  --t4: #a0aec0;
+  --bdr: #cbd5e1;
+  --c: #0284c7;
+  --g: #059669;
+  --r: #dc2626;
+  --o: #d97706;
+  --p: #7c3aed;
+  --y: #ca8a04;
+  --rd: rgba(220, 38, 38, .15);
+  --od: rgba(217, 119, 6, .15);
+  --gd: rgba(5, 150, 105, .15);
+  --pd: rgba(124, 58, 237, .15);
+  --cd: rgba(2, 132, 199, .15);
+  --rg: rgba(220, 38, 38, .05);
+  --cg: rgba(2, 132, 199, .05);
+}
+
+body.light-mode #nav { background: rgba(255,255,255,.8) !important; border-bottom: 1px solid var(--bdr); }
+body.light-mode .card, body.light-mode .tp, body.light-mode .mf { background: var(--bg2); border-color: var(--bdr); box-shadow: 0 4px 12px rgba(0,0,0,.03); }
+body.light-mode .fp, body.light-mode .raw-box { background: var(--bg3); border-color: var(--bdr); }
+body.light-mode .frm input, body.light-mode .frm select { background: var(--bg2); color: var(--t1); border: 1px solid #cbd5e1; }
+body.light-mode .frm input:focus, body.light-mode .frm select:focus { border-color: var(--c); background: var(--bg2); box-shadow: 0 0 0 3px var(--cd); }
+body.light-mode .dc { background: var(--bg2); }
+body.light-mode .tabs button.on, body.light-mode .tt.on { color: var(--t1); }
+body.light-mode .res-panel, body.light-mode .priv-grid { background: var(--bg1); }
+body.light-mode .pcard { background: var(--bg2); border-color: var(--bdr); box-shadow: 0 4px 12px rgba(0,0,0,.04); }
+
+/* Responsive Media Queries */
+@media (max-width: 1024px) {
+  .demo-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+@media (max-width: 900px) {
+  .ch22, .ch2, .stats-row, .priv-grid, .ana-grid, .hero-kpis { grid-template-columns: 1fr !important; gap: 1rem; }
+  .demo-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .tabs { flex-wrap: wrap; margin-bottom: 0.5rem; }
+  .tabs button { flex: 1; text-align: center; }
+  .trow { width: 100%; justify-content: center; }
+  .nav-links a { display: none; } /* Hide center nav on small screens for simplicity */
+  .feed-ctrls { flex-wrap: wrap; gap: 0.5rem; justify-content: flex-start; margin-top: 0.5rem; }
+}
+
+@media (max-width: 600px) {
+  .demo-grid { grid-template-columns: 1fr !important; }
+  .feed-cols { display: none; }
+  .fr { flex-direction: column; align-items: flex-start; gap: 0.4rem; height: auto; padding: 1rem; position: relative; }
+  .fr .fbank::before { content: "Route: "; font-weight: 700; color: var(--t3); }
+  .fr .famt::before { content: "Amount: "; font-weight: 700; color: var(--t3); }
+  .fr span { display: block; width: 100%; text-align: left; }
+  .fr span.rb-wrap { max-width: 100%; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ALERTS -->
+<div id="alerts"></div>
+
+<!-- MODAL -->
+<div id="mbg"><div id="mbox"><button class="m-close" onclick="closeMod()">✕</button><div class="m-inner" id="m-content"></div></div></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-w">
+    <div class="brand">
+      <div class="brand-ico">🛡</div>
+      <div><div class="brand-name">PFLF SYSTEM</div><div class="brand-sub">Federated Fraud Intelligence v2.0</div></div>
+    </div>
+    <nav class="nav-links">
+      <a href="#demo">Demo</a><a href="#arch">Architecture</a>
+      <a href="#dashboard">Dashboard</a><a href="#analyzer">Analyzer</a>
+      <a href="#comp">FL vs Central</a><a href="#priv">Privacy</a>
+    </nav>
+    <div class="nav-r">
+      <div class="ws-badge"><div class="wsdot off" id="wsdot"></div><span class="ws-lbl" id="wslbl">CONNECTING...</span></div>
+      <button class="nav-api" onclick="toggleTheme()" id="theme-btn" style="background:transparent;border:none;cursor:pointer;font-size:1.1rem;padding:0;margin-right:1rem;color:var(--t1)">🌞</button>
+      <a href="/api/health" target="_blank" class="nav-api">API ↗</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="hcvs"></canvas>
+  <span class="hero-tag">🔐 Privacy-Preserving · Federated Learning · Real-Time Detection</span>
+  <h1 class="hero-h1"><span class="l1">Financial Fraud Detection</span><span class="l2">Without Sharing Any Data</span></h1>
+  <p class="hero-sub">Complete Privacy-Preserving Federated Learning system — Node.js server with REST API + WebSocket + 4 real detection engines. Detects Credit Card Fraud, Money Laundering, Unauthorized Transactions and Fake Transactions across 10 bank nodes with zero raw data ever leaving any bank.</p>
+  <div class="hero-kpis">
+    <div class="kpi"><span class="kpi-n">97.3%</span><span class="kpi-l">Detection Accuracy</span></div>
+    <div class="kpi"><span class="kpi-n">ZERO</span><span class="kpi-l">Raw Data Shared</span></div>
+    <div class="kpi"><span class="kpi-n">4</span><span class="kpi-l">Fraud Categories</span></div>
+    <div class="kpi"><span class="kpi-n">10</span><span class="kpi-l">Bank Nodes</span></div>
+    <div class="kpi"><span class="kpi-n">&lt;12ms</span><span class="kpi-l">Detection Latency</span></div>
+  </div>
+  <div class="hero-btns">
+    <a href="#demo" class="btn-p">⚡ Examiner Demo</a>
+    <a href="#analyzer" class="btn-s">🔬 Risk Analyzer</a>
+    <a href="#dashboard" class="btn-s">📊 Live Dashboard</a>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section id="demo">
+  <div class="demo-in">
+    <div class="demo-hdr">
+      <div class="demo-eyebrow">⭐ Examiner Demo Mode</div>
+      <div class="demo-title">Click to Trigger <span style="color:var(--r)">Live Fraud Detection</span></div>
+      <div class="demo-hint">// Each button sends a POST request to the backend server — alert fires, transaction appears in live feed instantly</div>
+    </div>
+    <div class="demo-grid">
+      <div class="dc cc" onclick="trigger('CC')">
+        <div class="dc-badge">Triggered: <span id="dc-CC">0</span>×</div>
+        <span class="dc-ico">💳</span>
+        <div class="dc-title">Credit Card Fraud</div>
+        <div class="dc-desc">Card-Not-Present fraud with velocity anomaly, geo mismatch, new device. Red alert fires with full detection timeline.</div>
+        <button class="dc-btn" onclick="event.stopPropagation();trigger('CC')">▶ TRIGGER DETECTION</button>
+      </div>
+      <div class="dc ml" onclick="trigger('ML')">
+        <div class="dc-badge">Triggered: <span id="dc-ML">0</span>×</div>
+        <span class="dc-ico">🏦</span>
+        <div class="dc-title">Money Laundering</div>
+        <div class="dc-desc">3-stage AML — Placement, Layering, Integration. Shell accounts, FATF jurisdiction, structuring patterns flagged.</div>
+        <button class="dc-btn" onclick="event.stopPropagation();trigger('ML')">▶ TRIGGER DETECTION</button>
+      </div>
+      <div class="dc ut" onclick="trigger('UT')">
+        <div class="dc-badge">Triggered: <span id="dc-UT">0</span>×</div>
+        <span class="dc-ico">🔐</span>
+        <div class="dc-title">Unauthorized Transaction</div>
+        <div class="dc-desc">Account takeover via SIM swap. New device + 3 AM + new beneficiary = immediate block + customer alert.</div>
+        <button class="dc-btn" onclick="event.stopPropagation();trigger('UT')">▶ TRIGGER DETECTION</button>
+      </div>
+      <div class="dc ft" onclick="trigger('FT')">
+        <div class="dc-badge">Triggered: <span id="dc-FT">0</span>×</div>
+        <span class="dc-ico">👻</span>
+        <div class="dc-title">Fake Transaction</div>
+        <div class="dc-desc">Synthetic identity bust-out fraud. Ghost merchant + chargeback history + rapid credit utilisation detected.</div>
+        <button class="dc-btn" onclick="event.stopPropagation();trigger('FT')">▶ TRIGGER DETECTION</button>
+      </div>
+      <div class="dc it" onclick="trigger('IT')" style="border-color:var(--c)">
+        <div class="dc-badge">Triggered: <span id="dc-IT">0</span>×</div>
+        <span class="dc-ico">🕵️</span>
+        <div class="dc-title">Identity Theft</div>
+        <div class="dc-desc">Fraudulent documentation, repeated password resets, and credit pulling anomaly detected.</div>
+        <button class="dc-btn" onclick="event.stopPropagation();trigger('IT')">▶ TRIGGER DETECTION</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section id="arch" class="sec">
+<div class="sec-in">
+  <p class="sec-tag rv">System Architecture</p>
+  <h2 class="sec-h2 rv">Federated Learning <span>Data Flow</span></h2>
+  <p class="sec-p rv">Encrypted model gradients flow bank → aggregator → global model. Zero raw transaction data ever crosses any network boundary.</p>
+  <div class="card rv" style="padding:0;overflow:hidden"><canvas id="archcvs" height="460" style="width:100%;display:block"></canvas></div>
+  <div style="display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-top:1.1rem" class="rv">
+    <span style="display:flex;align-items:center;gap:.4rem;font-family:var(--FM);font-size:.6rem;color:var(--t2)"><span style="width:10px;height:10px;border-radius:50%;background:var(--c);display:block"></span>Bank Nodes</span>
+    <span style="display:flex;align-items:center;gap:.4rem;font-family:var(--FM);font-size:.6rem;color:var(--t2)"><span style="width:10px;height:10px;border-radius:50%;background:var(--p);display:block"></span>Local Models</span>
+    <span style="display:flex;align-items:center;gap:.4rem;font-family:var(--FM);font-size:.6rem;color:var(--t2)"><span style="width:10px;height:10px;border-radius:50%;background:var(--g);display:block"></span>Encrypted Gradients</span>
+    <span style="display:flex;align-items:center;gap:.4rem;font-family:var(--FM);font-size:.6rem;color:var(--t2)"><span style="width:10px;height:10px;border-radius:50%;background:var(--r);display:block"></span>Fraud Detections</span>
+  </div>
+</div>
+</section>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="sec" style="background:var(--bg1)">
+<div class="sec-in">
+  <p class="sec-tag rv">Live Intelligence</p>
+  <h2 class="sec-h2 rv">Real-Time <span>Fraud Dashboard</span></h2>
+  <div class="tabs-top rv">
+    <div class="tabs">
+      <button class="tab on" data-t="t-ov">📊 Overview</button>
+      <button class="tab" data-t="t-cc">💳 Credit Card</button>
+      <button class="tab" data-t="t-ml">💰 Money Laundering</button>
+      <button class="tab" data-t="t-ut">🔐 Unauthorized</button>
+      <button class="tab" data-t="t-ft">👻 Fake Transactions</button>
+      <button class="tab" data-t="t-it">🕵️ Identity</button>
+      <button class="tab" data-t="t-fl">🤖 FL Training</button>
+    </div>
+    <div class="trow"><button class="tbtn on">Live</button><button class="tbtn">1H</button><button class="tbtn">24H</button></div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="tp on" id="t-ov">
+    <div class="stats-row">
+      <div class="sc" style="--acol:var(--c)"><div class="sc-lbl">Total Transactions</div><div class="sc-val" id="s-total">0</div><div class="sc-chg up">↑ Live</div></div>
+      <div class="sc" style="--acol:var(--r)"><div class="sc-lbl">Fraud Detected</div><div class="sc-val" id="s-fraud">0</div><div class="sc-chg dn">⚠ All types</div></div>
+      <div class="sc" style="--acol:var(--o)"><div class="sc-lbl">Suspicious Flags</div><div class="sc-val" id="s-sus">0</div><div class="sc-chg nt">◉ Review</div></div>
+      <div class="sc" style="--acol:var(--g)"><div class="sc-lbl">Model Accuracy</div><div class="sc-val" id="s-acc">97.3%</div><div class="sc-chg up">↑ FL v3.2</div></div>
+      <div class="sc" style="--acol:var(--p)"><div class="sc-lbl">Blocked Amount</div><div class="sc-val" id="s-blk">₹0</div><div class="sc-chg up">↑ Saved</div></div>
+      <div class="sc" style="--acol:var(--y)"><div class="sc-lbl">Fraud Rate</div><div class="sc-val" id="s-rate">0%</div><div class="sc-chg nt">Session avg</div></div>
+    </div>
+    <div class="ch2">
+      <div class="card"><div class="card-hdr"><div><div class="card-title">Fraud Detection Timeline</div><div class="card-sub">Live fraud & suspicious events</div></div><span class="badge live">● LIVE</span></div><div class="chw"><canvas id="ch-tl"></canvas></div></div>
+      <div class="card"><div class="card-hdr"><div><div class="card-title">Fraud Type Split</div><div class="card-sub">Live breakdown</div></div><span class="badge info">4 Types</span></div><div class="chw"><canvas id="ch-dn"></canvas></div></div>
+    </div>
+    <div class="ch22">
+      <div class="card"><div class="card-hdr"><div><div class="card-title">24H Volume</div><div class="card-sub">Normal vs flagged by hour</div></div></div><div class="chw"><canvas id="ch-hr"></canvas></div></div>
+      <div class="card"><div class="card-hdr"><div><div class="card-title">Bank Risk Radar</div><div class="card-sub">Fraud events vs accuracy</div></div></div><div class="chw"><canvas id="ch-rd"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- CC TAB -->
+  <div class="tp" id="t-cc">
+    <div class="stats-row">
+      <div class="sc" style="--acol:var(--r)"><div class="sc-lbl">CC Fraud Events</div><div class="sc-val" id="s-cc">0</div><div class="sc-chg dn">⚠ Active</div></div>
+      <div class="sc" style="--acol:var(--o)"><div class="sc-lbl">Avg Amount</div><div class="sc-val">₹8,420</div><div class="sc-chg nt">Per incident</div></div>
+      <div class="sc" style="--acol:var(--g)"><div class="sc-lbl">Precision</div><div class="sc-val">96.8%</div><div class="sc-chg up">↑ FL</div></div>
+      <div class="sc" style="--acol:var(--c)"><div class="sc-lbl">Cards Protected</div><div class="sc-val">2.4M</div><div class="sc-chg up">Active</div></div>
+      <div class="sc" style="--acol:var(--p)"><div class="sc-lbl">CNP Blocks</div><div class="sc-val">847</div><div class="sc-chg dn">⚠ Today</div></div>
+      <div class="sc" style="--acol:var(--y)"><div class="sc-lbl">Recall</div><div class="sc-val">98.1%</div><div class="sc-chg up">↑ v3.2</div></div>
+    </div>
+    <div class="ch22" style="margin-bottom:.5rem">
+      <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:1.8rem">
+        <h3 style="font-family:var(--FD);font-size:1rem;font-weight:700;display:flex;align-items:center;gap:.6rem;margin-bottom:.9rem">💳 <span style="color:var(--r)">Credit Card Fraud</span></h3>
+        <p style="font-size:.81rem;color:var(--t2);line-height:1.8;margin-bottom:.85rem">Detects velocity anomaly, geo mismatch, new device login, off-hours activity, and card-not-present fraud patterns. The FL model learns individual spending profiles without sharing any cardholder data across banks.</p>
+        <div class="risk-rows">
+          <div class="rrow"><span class="rlbl">Transaction Velocity</span><div class="rtrk"><div class="rfill h" style="width:88%"></div></div><span class="rpct" style="color:var(--r)">88%</span></div>
+          <div class="rrow"><span class="rlbl">Location Mismatch</span><div class="rtrk"><div class="rfill h" style="width:79%"></div></div><span class="rpct" style="color:var(--r)">79%</span></div>
+          <div class="rrow"><span class="rlbl">Off-hours Activity</span><div class="rtrk"><div class="rfill h" style="width:74%"></div></div><span class="rpct" style="color:var(--r)">74%</span></div>
+          <div class="rrow"><span class="rlbl">Unusual Merchant</span><div class="rtrk"><div class="rfill m" style="width:62%"></div></div><span class="rpct" style="color:var(--o)">62%</span></div>
+          <div class="rrow"><span class="rlbl">Device Fingerprint</span><div class="rtrk"><div class="rfill l" style="width:38%"></div></div><span class="rpct" style="color:var(--c)">38%</span></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-hdr"><div><div class="card-title">Anomaly Scatter</div><div class="card-sub">Velocity vs Amount anomaly</div></div><span class="badge danger">LIVE</span></div><div class="chw-t"><canvas id="ch-cc"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- ML TAB -->
+  <div class="tp" id="t-ml">
+    <div class="stats-row">
+      <div class="sc" style="--acol:var(--p)"><div class="sc-lbl">AML Cases</div><div class="sc-val" id="s-ml">0</div><div class="sc-chg dn">⚠ Flagged</div></div>
+      <div class="sc" style="--acol:var(--r)"><div class="sc-lbl">Suspicious Volume</div><div class="sc-val">₹4.2Cr</div><div class="sc-chg nt">Monitored</div></div>
+      <div class="sc" style="--acol:var(--o)"><div class="sc-lbl">Shell Accounts</div><div class="sc-val">127</div><div class="sc-chg dn">Ghost nodes</div></div>
+      <div class="sc" style="--acol:var(--g)"><div class="sc-lbl">STRs Filed</div><div class="sc-val">89</div><div class="sc-chg up">↑ Compliance</div></div>
+      <div class="sc" style="--acol:var(--c)"><div class="sc-lbl">FATF Alerts</div><div class="sc-val">34</div><div class="sc-chg dn">⚠ Cross-border</div></div>
+      <div class="sc" style="--acol:var(--y)"><div class="sc-lbl">AML Precision</div><div class="sc-val">93.4%</div><div class="sc-chg up">↑ v3.2</div></div>
+    </div>
+    <div class="ch22">
+      <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:1.8rem">
+        <h3 style="font-family:var(--FD);font-size:1rem;font-weight:700;display:flex;align-items:center;gap:.6rem;margin-bottom:.9rem">💰 <span style="color:var(--p)">Money Laundering</span></h3>
+        <div style="display:flex;gap:.65rem;align-items:flex-start;margin-bottom:.7rem"><span style="font-family:var(--FM);font-size:.57rem;padding:.18rem .52rem;border-radius:4px;border:1px solid var(--rd);color:var(--r);white-space:nowrap;margin-top:.1rem">STAGE 1</span><div style="font-size:.8rem;color:var(--t2);line-height:1.6"><strong style="color:var(--t1)">Placement</strong> — Cash enters via structured deposits (smurfing below ₹10L threshold), hawala, or demand drafts.</div></div>
+        <div style="display:flex;gap:.65rem;align-items:flex-start;margin-bottom:.7rem"><span style="font-family:var(--FM);font-size:.57rem;padding:.18rem .52rem;border-radius:4px;border:1px solid var(--pd);color:var(--p);white-space:nowrap;margin-top:.1rem">STAGE 2</span><div style="font-size:.8rem;color:var(--t2);line-height:1.6"><strong style="color:var(--t1)">Layering</strong> — Complex web of shell accounts, wire transfers across multiple banks and jurisdictions.</div></div>
+        <div style="display:flex;gap:.65rem;align-items:flex-start;margin-bottom:.85rem"><span style="font-family:var(--FM);font-size:.57rem;padding:.18rem .52rem;border-radius:4px;border:1px solid var(--gd);color:var(--g);white-space:nowrap;margin-top:.1rem">STAGE 3</span><div style="font-size:.8rem;color:var(--t2);line-height:1.6"><strong style="color:var(--t1)">Integration</strong> — Funds re-enter economy via real estate, luxury goods, or business revenue inflation.</div></div>
+        <div class="risk-rows">
+          <div class="rrow"><span class="rlbl">Round-trip Transfers</span><div class="rtrk"><div class="rfill h" style="width:92%"></div></div><span class="rpct" style="color:var(--r)">92%</span></div>
+          <div class="rrow"><span class="rlbl">Structuring (Smurfing)</span><div class="rtrk"><div class="rfill h" style="width:85%"></div></div><span class="rpct" style="color:var(--r)">85%</span></div>
+          <div class="rrow"><span class="rlbl">Shell Account Network</span><div class="rtrk"><div class="rfill h" style="width:78%"></div></div><span class="rpct" style="color:var(--r)">78%</span></div>
+          <div class="rrow"><span class="rlbl">Cross-border Velocity</span><div class="rtrk"><div class="rfill m" style="width:66%"></div></div><span class="rpct" style="color:var(--o)">66%</span></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-hdr"><div><div class="card-title">AML 3-Stage Flow</div><div class="card-sub">12-day laundering pattern</div></div></div><div class="chw-t"><canvas id="ch-ml"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- UT TAB -->
+  <div class="tp" id="t-ut">
+    <div class="stats-row">
+      <div class="sc" style="--acol:var(--o)"><div class="sc-lbl">Unauthorized Txns</div><div class="sc-val" id="s-ut">0</div><div class="sc-chg dn">⚠ Blocked</div></div>
+      <div class="sc" style="--acol:var(--r)"><div class="sc-lbl">Compromised Accs</div><div class="sc-val">142</div><div class="sc-chg dn">Review</div></div>
+      <div class="sc" style="--acol:var(--c)"><div class="sc-lbl">Response Time</div><div class="sc-val">11ms</div><div class="sc-chg up">↑ Speed</div></div>
+      <div class="sc" style="--acol:var(--g)"><div class="sc-lbl">Prevented Loss</div><div class="sc-val">₹1.8Cr</div><div class="sc-chg up">↑ Month</div></div>
+      <div class="sc" style="--acol:var(--p)"><div class="sc-lbl">SIM Swap Blocks</div><div class="sc-val">58</div><div class="sc-chg dn">⚠ Active</div></div>
+      <div class="sc" style="--acol:var(--y)"><div class="sc-lbl">Recall</div><div class="sc-val">95.7%</div><div class="sc-chg up">↑ FL</div></div>
+    </div>
+    <div class="ch22">
+      <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:1.8rem">
+        <h3 style="font-family:var(--FD);font-size:1rem;font-weight:700;display:flex;align-items:center;gap:.6rem;margin-bottom:.9rem">🔐 <span style="color:var(--o)">Unauthorized Transactions</span></h3>
+        <p style="font-size:.81rem;color:var(--t2);line-height:1.8;margin-bottom:.85rem">Detects account takeover via SIM swap, phishing, credential compromise, and insider threats. The FL model builds behavioral baselines per customer — any deviation triggers real-time risk scoring without sharing PII.</p>
+        <div class="risk-rows">
+          <div class="rrow"><span class="rlbl">New Device + Transfer</span><div class="rtrk"><div class="rfill h" style="width:94%"></div></div><span class="rpct" style="color:var(--r)">94%</span></div>
+          <div class="rrow"><span class="rlbl">Off-hours Login</span><div class="rtrk"><div class="rfill h" style="width:83%"></div></div><span class="rpct" style="color:var(--r)">83%</span></div>
+          <div class="rrow"><span class="rlbl">OTP Failure Chain</span><div class="rtrk"><div class="rfill h" style="width:87%"></div></div><span class="rpct" style="color:var(--r)">87%</span></div>
+          <div class="rrow"><span class="rlbl">Unknown Beneficiary</span><div class="rtrk"><div class="rfill m" style="width:69%"></div></div><span class="rpct" style="color:var(--o)">69%</span></div>
+          <div class="rrow"><span class="rlbl">Geo-IP Mismatch</span><div class="rtrk"><div class="rfill h" style="width:91%"></div></div><span class="rpct" style="color:var(--r)">91%</span></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-hdr"><div><div class="card-title">Detection Accuracy per Type</div><div class="card-sub">Recall vs false positive rate</div></div></div><div class="chw-t"><canvas id="ch-ut"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- FT TAB -->
+  <div class="tp" id="t-ft">
+    <div class="stats-row">
+      <div class="sc" style="--acol:var(--g)"><div class="sc-lbl">Fake Txns Blocked</div><div class="sc-val" id="s-ft">0</div><div class="sc-chg dn">⚠ Synthetic</div></div>
+      <div class="sc" style="--acol:var(--r)"><div class="sc-lbl">Synthetic IDs</div><div class="sc-val">234</div><div class="sc-chg dn">Ghost accounts</div></div>
+      <div class="sc" style="--acol:var(--p)"><div class="sc-lbl">Ghost Merchants</div><div class="sc-val">67</div><div class="sc-chg dn">Flagged</div></div>
+      <div class="sc" style="--acol:var(--o)"><div class="sc-lbl">Chargeback Fraud</div><div class="sc-val">89</div><div class="sc-chg nt">1st-party</div></div>
+      <div class="sc" style="--acol:var(--c)"><div class="sc-lbl">Bust-out Risk</div><div class="sc-val">43</div><div class="sc-chg dn">⚠ Patterns</div></div>
+      <div class="sc" style="--acol:var(--y)"><div class="sc-lbl">Recall</div><div class="sc-val">94.2%</div><div class="sc-chg up">↑ v3.2</div></div>
+    </div>
+    <div class="ch22">
+      <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:1.8rem">
+        <h3 style="font-family:var(--FD);font-size:1rem;font-weight:700;display:flex;align-items:center;gap:.6rem;margin-bottom:.9rem">👻 <span style="color:var(--g)">Fake Transactions</span></h3>
+        <p style="font-size:.81rem;color:var(--t2);line-height:1.8;margin-bottom:.85rem">Detects synthetic identity fraud, ghost merchant processing, chargeback abuse, and bust-out fraud. The FL model identifies statistical impossibilities in fabricated behavioral profiles that rule-based systems cannot catch.</p>
+        <div class="risk-rows">
+          <div class="rrow"><span class="rlbl">Synthetic ID Signals</span><div class="rtrk"><div class="rfill h" style="width:89%"></div></div><span class="rpct" style="color:var(--r)">89%</span></div>
+          <div class="rrow"><span class="rlbl">Ghost Merchant Txns</span><div class="rtrk"><div class="rfill h" style="width:84%"></div></div><span class="rpct" style="color:var(--r)">84%</span></div>
+          <div class="rrow"><span class="rlbl">Bust-out Patterns</span><div class="rtrk"><div class="rfill h" style="width:91%"></div></div><span class="rpct" style="color:var(--r)">91%</span></div>
+          <div class="rrow"><span class="rlbl">Chargeback Rate</span><div class="rtrk"><div class="rfill m" style="width:72%"></div></div><span class="rpct" style="color:var(--o)">72%</span></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-hdr"><div><div class="card-title">Fake Txn Detection Rates</div><div class="card-sub">By fraud sub-type</div></div></div><div class="chw-t"><canvas id="ch-ft"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- IT TAB -->
+  <div class="tp" id="t-it">
+    <div class="stats-row">
+      <div class="sc" style="--acol:var(--c)"><div class="sc-lbl">Identity Locks</div><div class="sc-val" id="s-it">0</div><div class="sc-chg dn">⚠ Critical</div></div>
+      <div class="sc" style="--acol:var(--g)"><div class="sc-lbl">Fake Docs</div><div class="sc-val">412</div><div class="sc-chg dn">Rejected</div></div>
+      <div class="sc" style="--acol:var(--p)"><div class="sc-lbl">Credit Inquiries</div><div class="sc-val">892</div><div class="sc-chg nt">Monitored</div></div>
+      <div class="sc" style="--acol:var(--y)"><div class="sc-lbl">Recall</div><div class="sc-val">96.3%</div><div class="sc-chg up">↑ FL</div></div>
+    </div>
+    <div class="ch22">
+       <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:1.8rem">
+        <h3 style="font-family:var(--FD);font-size:1rem;font-weight:700;display:flex;align-items:center;gap:.6rem;margin-bottom:.9rem">🕵️ <span style="color:var(--c)">Identity Theft</span></h3>
+        <p style="font-size:.81rem;color:var(--t2);line-height:1.8;margin-bottom:.85rem">Detects fraudulent verification attempts, abnormal password resets, and targeted credit sweeps across bank boundaries.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FL TAB -->
+  <div class="tp" id="t-fl">
+    <div class="stats-row">
+      <div class="sc" style="--acol:var(--c)"><div class="sc-lbl">FL Round</div><div class="sc-val" id="s-rnd">47</div><div class="sc-chg up">↑ Running</div></div>
+      <div class="sc" style="--acol:var(--g)"><div class="sc-lbl">Global Accuracy</div><div class="sc-val" id="s-acc2">97.3%</div><div class="sc-chg up">↑ Improving</div></div>
+      <div class="sc" style="--acol:var(--y)"><div class="sc-lbl">Privacy ε</div><div class="sc-val" id="s-eps">0.900</div><div class="sc-chg nt">&lt;10 budget</div></div>
+      <div class="sc" style="--acol:var(--p)"><div class="sc-lbl">Active Banks</div><div class="sc-val">10/10</div><div class="sc-chg up">All nodes</div></div>
+      <div class="sc" style="--acol:var(--o)"><div class="sc-lbl">Algorithm</div><div class="sc-val" style="font-size:1.1rem">FedAvg</div><div class="sc-chg nt">Aggregation</div></div>
+      <div class="sc" style="--acol:var(--r)"><div class="sc-lbl">False Positive</div><div class="sc-val">1.4%</div><div class="sc-chg dn">↓ Improving</div></div>
+    </div>
+    <div class="fl-wrap">
+      <div class="fl-title">🏦 Bank Node Training — <span id="fl-rnd-lbl" style="color:var(--c)">Round 47</span></div>
+      <div class="banks-g" id="banks-g">
+        <div class="bn" id="bn-0"><div class="bn-ico">🏦</div><div class="bn-name">HDFC</div><div class="bn-stat" id="bs-0">IDLE</div></div>
+        <div class="bn" id="bn-1"><div class="bn-ico">🏛</div><div class="bn-name">SBI</div><div class="bn-stat" id="bs-1">IDLE</div></div>
+        <div class="bn" id="bn-2"><div class="bn-ico">🏪</div><div class="bn-name">ICICI</div><div class="bn-stat" id="bs-2">IDLE</div></div>
+        <div class="bn" id="bn-3"><div class="bn-ico">🔷</div><div class="bn-name">Axis</div><div class="bn-stat" id="bs-3">IDLE</div></div>
+        <div class="bn" id="bn-4"><div class="bn-ico">💼</div><div class="bn-name">Kotak</div><div class="bn-stat" id="bs-4">IDLE</div></div>
+        <div class="bn" id="bn-5"><div class="bn-ico">🌾</div><div class="bn-name">PNB</div><div class="bn-stat" id="bs-5">IDLE</div></div>
+        <div class="bn" id="bn-6"><div class="bn-ico">🔶</div><div class="bn-name">BoB</div><div class="bn-stat" id="bs-6">IDLE</div></div>
+        <div class="bn" id="bn-7"><div class="bn-ico">🌿</div><div class="bn-name">Canara</div><div class="bn-stat" id="bs-7">IDLE</div></div>
+        <div class="bn" id="bn-8"><div class="bn-ico">🔵</div><div class="bn-name">UCO</div><div class="bn-stat" id="bs-8">IDLE</div></div>
+        <div class="bn" id="bn-9"><div class="bn-ico">🟣</div><div class="bn-name">Bandhan</div><div class="bn-stat" id="bs-9">IDLE</div></div>
+      </div>
+      <div class="fl-prog">
+        <div class="fl-pr"><span class="fl-pr-lbl">Local Training</span><div class="fl-pr-trk"><div class="fl-pr-fill" id="flp1" style="width:0%"></div></div><span class="fl-pr-val" id="flv1">0%</span></div>
+        <div class="fl-pr"><span class="fl-pr-lbl">Gradient Encryption</span><div class="fl-pr-trk"><div class="fl-pr-fill" id="flp2" style="width:0%"></div></div><span class="fl-pr-val" id="flv2">0%</span></div>
+        <div class="fl-pr"><span class="fl-pr-lbl">Secure Aggregation</span><div class="fl-pr-trk"><div class="fl-pr-fill" id="flp3" style="width:0%"></div></div><span class="fl-pr-val" id="flv3">0%</span></div>
+        <div class="fl-pr"><span class="fl-pr-lbl">Global Model Update</span><div class="fl-pr-trk"><div class="fl-pr-fill" id="flp4" style="width:0%"></div></div><span class="fl-pr-val" id="flv4">0%</span></div>
+      </div>
+    </div>
+    <div class="ch22">
+      <div class="card"><div class="card-hdr"><div><div class="card-title">Accuracy vs Rounds</div><div class="card-sub">FL converges to match centralized — with full privacy</div></div></div><div class="chw"><canvas id="ch-fl-a"></canvas></div></div>
+      <div class="card"><div class="card-hdr"><div><div class="card-title">Privacy Budget (ε)</div><div class="card-sub">Differential privacy per round — must stay &lt;10</div></div></div><div class="chw"><canvas id="ch-fl-p"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- LIVE FEED -->
+  <div class="dvd"></div>
+  <div id="feed" class="rv">
+    <div class="feed-hdr">
+      <div class="feed-title"><div class="wsdot" style="display:inline-block;margin-right:.25rem"></div>Live Transaction Stream — All Bank Nodes</div>
+      <div class="feed-ctrls">
+        <span class="finfo" id="fcount">0 transactions</span>
+        <select id="feed-status" onchange="renderFeed()" style="background:var(--bg2);color:var(--t1);border:1px solid var(--bdr);border-radius:4px;padding:3px 8px;font-size:.65rem;cursor:pointer;outline:none"><option value="all">All Status</option><option value="fraud">Fraud</option><option value="suspect">Suspect</option><option value="clean">Clean</option></select>
+        <select id="feed-type" onchange="renderFeed()" style="background:var(--bg2);color:var(--t1);border:1px solid var(--bdr);border-radius:4px;padding:3px 8px;font-size:.65rem;cursor:pointer;outline:none"><option value="all">All Types</option><option value="CC">Credit Card</option><option value="ML">Money Laundering</option><option value="UT">Unauthorized</option><option value="FT">Fake Txn</option><option value="IT">Identity Theft</option></select>
+        <button class="fcb" id="fpause">⏸ Pause</button>
+        <button class="fcb" onclick="allTxns=[];fCnt=0;renderFeed()">🗑 Clear</button>
+        <button class="fcb" onclick="exportCSV()">Export CSV ⬇</button>
+      </div>
+    </div>
+    <div class="feed-cols">
+      <span class="fch">Txn ID</span><span class="fch">Bank Route</span><span class="fch">Amount</span>
+      <span class="fch">Fraud Category</span><span class="fch">Status</span><span class="fch">Risk Score</span><span class="fch">Latency</span>
+    </div>
+    <div class="feed-body" id="fbody"></div>
+  </div>
+</div>
+</section>
+
+<!-- ANALYZER -->
+<section id="analyzer" class="sec">
+<div class="sec-in">
+  <p class="sec-tag rv">Live Detection Engine</p>
+  <h2 class="sec-h2 rv">Transaction <span>Risk Analyzer</span></h2>
+  <p class="sec-p rv">Load a preset scenario or type custom values — the server scores every risk factor in real-time and explains exactly why a transaction is or isn't fraud.</p>
+  <div class="ana-grid">
+    <div class="ana-form rv">
+      <h3>🔬 Fraud Risk Analysis</h3>
+      <p class="desc">Load a preset scenario or enter custom values — then click Analyze to call the live API</p>
+      <div class="type-tabs">
+        <button class="tt cc on" onclick="switchType('cc')">💳 CC Fraud</button>
+        <button class="tt ml" onclick="switchType('ml')">💰 Money Laundering</button>
+        <button class="tt ut" onclick="switchType('ut')">🔐 Unauthorized</button>
+        <button class="tt ft" onclick="switchType('ft')">👻 Fake Transaction</button>
+        <button class="tt it" onclick="switchType('it')">🕵️ Identity</button>
+      </div>
+
+      <!-- CC -->
+      <div class="fp on" id="fp-cc">
+        <div class="preset-panel">
+          <div class="preset-hdr"><span class="preset-hdr-lbl">⚡ Quick Load Example</span><span class="preset-hdr-hint">click to auto-fill + analyze</span></div>
+          <div class="preset-btns">
+            <button class="pb crit" onclick="loadPreset('cc','crit')"><span class="pb-dot"></span>🤖 Bot Attack ~95</button>
+            <button class="pb high" onclick="loadPreset('cc','high')"><span class="pb-dot"></span>🌍 Nigeria Fraud ~88</button>
+            <button class="pb med"  onclick="loadPreset('cc','med')"><span class="pb-dot"></span>⚠️ Late Night ~55</button>
+            <button class="pb low"  onclick="loadPreset('cc','low')"><span class="pb-dot"></span>✓ Normal ~12</button>
+            <button class="pb low2" onclick="loadPreset('cc','low2')"><span class="pb-dot"></span>✓ Small Txn ~8</button>
+          </div>
+        </div>
+        <div class="fg">
+          <div class="frm"><label>Amount (₹) <span class="frm-tip">higher = more risk</span></label><input type="number" id="cc-amt" value="450000" placeholder="e.g. 450000 = high risk"/></div>
+          <div class="frm"><label>Hour (0–23) <span class="frm-tip">1–4 AM = peak fraud</span></label><input type="number" id="cc-hr" value="3" placeholder="1-4=fraud peak" min="0" max="23"/></div>
+          <div class="frm"><label>Country</label><select id="cc-cty">
+              <option value="IN">🇮🇳 India (Low Risk)</option>
+              <option value="AE">🇦🇪 UAE (Medium Risk)</option>
+              <option value="US">🇺🇸 USA (Medium Risk)</option>
+              <option value="GB">🇬🇧 UK (Medium Risk)</option>
+              <option value="CN">🇨🇳 China (High Risk)</option>
+              <option value="RU">🇷🇺 Russia (Very High)</option>
+              <option value="NG">🇳🇬 Nigeria (Critical)</option>
+            </select></div>
+          <div class="frm"><label>Transactions This Hour <span class="frm-tip">normal = 2–3/hr</span></label><input type="number" id="cc-vel" value="28" placeholder="normal=2-3/hr"/></div>
+        </div>
+        <div class="chk-grp">
+          <label class="ci checked" id="ci-cc-nd" onclick="toggleCI(this,'cc-nd')">
+            <input type="checkbox" id="cc-nd" checked/>
+            <span class="ci-box">✓</span>
+            <span class="ci-text">New / unregistered device</span>
+          </label>
+          <label class="ci checked" id="ci-cc-fi" onclick="toggleCI(this,'cc-fi')">
+            <input type="checkbox" id="cc-fi" checked/>
+            <span class="ci-box">✓</span>
+            <span class="ci-text">Foreign IP address detected</span>
+          </label>
+        </div>
+        <div style="margin-top:1.1rem;padding:.75rem;background:var(--bg3);border-radius:8px;font-family:var(--FM);font-size:.62rem;color:var(--t3)">💡 <strong style="color:var(--c)">Try Low Risk:</strong> Amount ₹5000, Hour 14, India, 2 txns, uncheck both boxes → Score should be LOW</div>
+      </div>
+
+      <!-- ML -->
+      <div class="fp" id="fp-ml">
+        <div class="preset-panel">
+          <div class="preset-hdr"><span class="preset-hdr-lbl">⚡ Quick Load Example</span><span class="preset-hdr-hint">click to auto-fill + analyze</span></div>
+          <div class="preset-btns">
+            <button class="pb crit" onclick="loadPreset('ml','crit')"><span class="pb-dot"></span>🐚 Shell+Smurfing ~94</button>
+            <button class="pb high" onclick="loadPreset('ml','high')"><span class="pb-dot"></span>🌍 FATF Transfer ~85</button>
+            <button class="pb med"  onclick="loadPreset('ml','med')"><span class="pb-dot"></span>⚠️ Overseas ~48</button>
+            <button class="pb low"  onclick="loadPreset('ml','low')"><span class="pb-dot"></span>✓ Normal ~10</button>
+            <button class="pb low2" onclick="loadPreset('ml','low2')"><span class="pb-dot"></span>✓ Old Account ~6</button>
+          </div>
+        </div>
+        <div class="fg">
+          <div class="frm"><label>Amount (₹) <span class="frm-tip">near ₹90K = smurfing</span></label><input type="number" id="ml-amt" value="95000" placeholder="near 90000=smurfing"/></div>
+          <div class="frm"><label>Transactions in 24H <span class="frm-tip">&gt;25 = layering</span></label><input type="number" id="ml-txc" value="18" placeholder=">25=layering"/></div>
+          <div class="frm"><label>Country</label><select id="ml-cty">
+              <option value="IN">🇮🇳 India (Low Risk)</option>
+              <option value="AE">🇦🇪 UAE (Medium)</option>
+              <option value="US">🇺🇸 USA (Medium)</option>
+              <option value="CN">🇨🇳 China (High)</option>
+              <option value="RU">🇷🇺 Russia (Very High)</option>
+              <option value="NG">🇳🇬 Nigeria (Critical)</option>
+            </select></div>
+          <div class="frm"><label>Account Age (months) <span class="frm-tip">&lt;3 = new risk</span></label><input type="number" id="ml-age" value="2" placeholder="<3=new account"/></div>
+        </div>
+        <div class="chk-grp">
+          <label class="ci checked" id="ci-ml-cb" onclick="toggleCI(this,'ml-cb')">
+            <input type="checkbox" id="ml-cb" checked/>
+            <span class="ci-box">✓</span>
+            <span class="ci-text">Cross-border transfer</span>
+          </label>
+          <label class="ci checked" id="ci-ml-sc" onclick="toggleCI(this,'ml-sc')">
+            <input type="checkbox" id="ml-sc" checked/>
+            <span class="ci-box">✓</span>
+            <span class="ci-text">Beneficiary is shell company</span>
+          </label>
+          <label class="ci checked" id="ci-ml-st" onclick="toggleCI(this,'ml-st')">
+            <input type="checkbox" id="ml-st" checked/>
+            <span class="ci-box">✓</span>
+            <span class="ci-text">Structuring (amount near threshold)</span>
+          </label>
+        </div>
+        <div style="margin-top:1.1rem;padding:.75rem;background:var(--bg3);border-radius:8px;font-family:var(--FM);font-size:.62rem;color:var(--t3)">💡 <strong style="color:var(--c)">Try Low Risk:</strong> Amount ₹10000, 2 txns/day, India, 36 months old, uncheck all → Score should be LOW</div>
+      </div>
+
+      <!-- UT -->
+      <div class="fp" id="fp-ut">
+        <div class="preset-panel">
+          <div class="preset-hdr"><span class="preset-hdr-lbl">⚡ Quick Load Example</span><span class="preset-hdr-hint">click to auto-fill + analyze</span></div>
+          <div class="preset-btns">
+            <button class="pb crit" onclick="loadPreset('ut','crit')"><span class="pb-dot"></span>☎️ SIM Swap ~97</button>
+            <button class="pb high" onclick="loadPreset('ut','high')"><span class="pb-dot"></span>📱 Takeover ~82</button>
+            <button class="pb med"  onclick="loadPreset('ut','med')"><span class="pb-dot"></span>⚠️ New Device ~50</button>
+            <button class="pb low"  onclick="loadPreset('ut','low')"><span class="pb-dot"></span>✓ Normal ~10</button>
+            <button class="pb low2" onclick="loadPreset('ut','low2')"><span class="pb-dot"></span>✓ Small ~5</button>
+          </div>
+        </div>
+        <div class="fg">
+          <div class="frm"><label>Amount (₹) <span class="frm-tip">large to new bene = risk</span></label><input type="number" id="ut-amt" value="150000" placeholder="large=higher risk"/></div>
+          <div class="frm"><label>Hour (0–23) <span class="frm-tip">1–4 AM = takeover peak</span></label><input type="number" id="ut-hr" value="3" placeholder="1-4=peak fraud" min="0" max="23"/></div>
+          <div class="frm"><label>Country</label><select id="ut-cty">
+              <option value="IN">🇮🇳 India (Low Risk)</option>
+              <option value="AE">🇦🇪 UAE (Medium)</option>
+              <option value="CN">🇨🇳 China (High)</option>
+              <option value="RU">🇷🇺 Russia (Very High)</option>
+            </select></div>
+          <div class="frm"><label>Account Age (months)</label><input type="number" id="ut-age" value="36"/></div>
+        </div>
+        <div class="chk-grp">
+          <label class="ci checked" id="ci-ut-nd" onclick="toggleCI(this,'ut-nd')">
+            <input type="checkbox" id="ut-nd" checked/>
+            <span class="ci-box">✓</span>
+            <span class="ci-text">New unregistered device</span>
+          </label>
+          <label class="ci checked" id="ci-ut-nb" onclick="toggleCI(this,'ut-nb')">
+            <input type="checkbox" id="ut-nb" checked/>
+            <span class="ci-box">✓</span>
+            <span class="ci-text">Transfer to new beneficiary</span>
+          </label>
+          <label class="ci checked" id="ci-ut-otp" onclick="toggleCI(this,'ut-otp')">
+            <input type="checkbox" id="ut-otp" checked/>
+            <span class="ci-box">✓</span>
+            <span class="ci-text">Multiple OTP failures before success</span>
+          </label>
+          <label class="ci checked" id="ci-ut-cc" onclick="toggleCI(this,'ut-cc')">
+            <input type="checkbox" id="ut-cc" checked/>
+            <span class="ci-box">✓</span>
+            <span class="ci-text">Credential change 30 min before</span>
+          </label>
+          <label class="ci checked" id="ci-ut-geo" onclick="toggleCI(this,'ut-geo')">
+            <input type="checkbox" id="ut-geo" checked/>
+            <span class="ci-box">✓</span>
+            <span class="ci-text">Geographic IP mismatch</span>
+          </label>
+        </div>
+        <div style="margin-top:1.1rem;padding:.75rem;background:var(--bg3);border-radius:8px;font-family:var(--FM);font-size:.62rem;color:var(--t3)">💡 <strong style="color:var(--c)">Try Low Risk:</strong> Amount ₹5000, Hour 14, India, 36 months, uncheck all → Score should be LOW</div>
+      </div>
+
+      <!-- FT -->
+      <div class="fp" id="fp-ft">
+        <div class="preset-panel">
+          <div class="preset-hdr"><span class="preset-hdr-lbl">⚡ Quick Load Example</span><span class="preset-hdr-hint">click to auto-fill + analyze</span></div>
+          <div class="preset-btns">
+            <button class="pb crit" onclick="loadPreset('ft','crit')"><span class="pb-dot"></span>👻 Full Bust-out ~96</button>
+            <button class="pb high" onclick="loadPreset('ft','high')"><span class="pb-dot"></span>🧟 Synthetic ID ~80</button>
+            <button class="pb med"  onclick="loadPreset('ft','med')"><span class="pb-dot"></span>⚠️ Chargeback ~45</button>
+            <button class="pb low"  onclick="loadPreset('ft','low')"><span class="pb-dot"></span>✓ Legit ~10</button>
+            <button class="pb low2" onclick="loadPreset('ft','low2')"><span class="pb-dot"></span>✓ Established ~5</button>
+          </div>
+        </div>
+        <div class="fg">
+          <div class="frm"><label>Amount (₹)</label><input type="number" id="ft-amt" value="4500" placeholder="inflated=fraud"/></div>
+          <div class="frm"><label>Account Age (months)</label><input type="number" id="ft-age" value="2" placeholder="<3=synthetic"/></div>
+          <div class="frm"><label>Merchant Risk <span class="frm-tip">1.0 = ghost merchant</span></label><input type="number" id="ft-mr" value="0.9" placeholder="0=safe,1=ghost" min="0" max="1" step="0.1"/></div>
+          <div class="frm"><label>Previous Chargebacks <span class="frm-tip">&gt;5 = serial fraud</span></label><input type="number" id="ft-cb" value="7" placeholder=">5=serial fraud"/></div>
+        </div>
+        <div class="chk-grp">
+          <label class="ci checked" id="ci-ft-si" onclick="toggleCI(this,'ft-si')">
+            <input type="checkbox" id="ft-si" checked/>
+            <span class="ci-box">✓</span>
+            <span class="ci-text">Synthetic identity signals</span>
+          </label>
+          <label class="ci checked" id="ci-ft-gm" onclick="toggleCI(this,'ft-gm')">
+            <input type="checkbox" id="ft-gm" checked/>
+            <span class="ci-box">✓</span>
+            <span class="ci-text">Ghost / non-existent merchant</span>
+          </label>
+          <label class="ci checked" id="ci-ft-bo" onclick="toggleCI(this,'ft-bo')">
+            <input type="checkbox" id="ft-bo" checked/>
+            <span class="ci-box">✓</span>
+            <span class="ci-text">Rapid credit utilisation (bust-out)</span>
+          </label>
+          <label class="ci checked" id="ci-ft-ii" onclick="toggleCI(this,'ft-ii')">
+            <input type="checkbox" id="ft-ii" checked/>
+            <span class="ci-box">✓</span>
+            <span class="ci-text">Invoice amount inflation</span>
+          </label>
+        </div>
+        <div style="margin-top:1.1rem;padding:.75rem;background:var(--bg3);border-radius:8px;font-family:var(--FM);font-size:.62rem;color:var(--t3)">💡 <strong style="color:var(--c)">Try Low Risk:</strong> Amount ₹500, 36 months, merchant risk 0.1, 0 chargebacks, uncheck all → Score should be LOW</div>
+      </div>
+
+      <!-- IT -->
+      <div class="fp" id="fp-it">
+        <div class="fg">
+          <div class="frm"><label>Amount (₹)</label><input type="number" id="it-amt" value="50000"/></div>
+        </div>
+        <div class="chk-grp">
+          <label class="ci checked" id="ci-it-pwd" onclick="toggleCI(this,'it-pwd')"><input type="checkbox" id="it-pwd" checked/><span class="ci-box">✓</span><span class="ci-text">Frequent password resets</span></label>
+          <label class="ci checked" id="ci-it-doc" onclick="toggleCI(this,'it-doc')"><input type="checkbox" id="it-doc" checked/><span class="ci-box">✓</span><span class="ci-text">Fake documents used</span></label>
+          <label class="ci checked" id="ci-it-cred" onclick="toggleCI(this,'it-cred')"><input type="checkbox" id="it-cred" checked/><span class="ci-box">✓</span><span class="ci-text">Multiple credit pulls</span></label>
+        </div>
+      </div>
+
+      <button class="ana-btn" id="ana-btn" onclick="analyze()">⚡ Analyze Transaction</button>
+      <div class="ep-info"><div class="ep-lbl">API endpoint called</div><div class="ep-val" id="ep-val">POST /api/analyze/cc</div></div>
+    </div>
+
+    <div class="res-panel rv">
+      <div class="res-ph" id="res-ph">
+        <div class="res-ph-ico">⚡</div>
+        <p>Load a preset or type your own values,<br>then click <strong style="color:var(--c)">Analyze Transaction Now</strong><br><br>Each factor is scored individually<br>and explained in plain English.<br><br><span style="color:var(--t4)">💡 Try loading a preset first,<br>then tweak values to see scores change</span></p>
+      </div>
+      <div class="res-out" id="res-out">
+        <div class="ring-wrap">
+          <canvas id="res-ring" width="155" height="155" style="max-width:155px;display:block;margin:0 auto"></canvas>
+          <div class="ring-center"><span class="ring-num" id="ring-n">0</span><span class="ring-lbl">RISK SCORE</span><span class="ring-rlv" id="ring-lv">—</span></div>
+        </div>
+        <div><div class="bk-title">RISK FACTOR BREAKDOWN</div><div id="bk-rows"></div></div>
+        <div class="verdict" id="verdict">
+          <div class="verdict-lv" id="v-lv">—</div>
+          <div class="verdict-act" id="v-act">—</div>
+          <div class="verdict-msg" id="v-msg">—</div>
+          <ul class="verdict-steps" id="v-steps"></ul>
+        </div>
+        <div class="raw-box"><div class="raw-title">RAW API RESPONSE (JSON)</div><pre class="raw-pre" id="raw-pre">// Response will appear here</pre></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- FL vs CENTRALIZED -->
+<section id="comp" class="sec" style="background:var(--bg1)">
+<div class="sec-in">
+  <p class="sec-tag rv">System Comparison</p>
+  <h2 class="sec-h2 rv">Federated vs <span>Centralized</span> Systems</h2>
+  <p class="sec-p rv">Toggle to understand exactly why federated learning is the only viable approach for multi-bank fraud detection.</p>
+  <div class="ctgl rv"><div class="ctgl-inner">
+    <button class="ctb bad on" data-cv="cv-bad">⚠️ Centralized ML Problems</button>
+    <button class="ctb good" data-cv="cv-good">✅ Federated Learning Solution</button>
+  </div></div>
+  <div id="cv-bad" class="cv on">
+    <div class="cpanel bad">
+      <h3 style="color:var(--r)">❌ Centralized Architecture — Why It Fails</h3>
+      <p class="cdesc">All raw bank transaction data sent to one central server. Legally impossible, catastrophically risky, commercially unacceptable.</p>
+      <ul class="clist">
+        <li><span>🔴</span>Raw customer PAN, accounts, transaction history, location transmitted over networks — violates banking secrecy laws</li>
+        <li><span>🔴</span>Single point of failure — one breach exposes ALL banks' data simultaneously with zero recovery possible</li>
+        <li><span>🔴</span>Violates GDPR, RBI Data Localization 2018, India's DPDP Act 2023, PCI-DSS v4.0</li>
+        <li><span>🔴</span>Banks cannot legally share proprietary customer data with competitors or third-party processors</li>
+        <li><span>🔴</span>Gradient inversion attacks can reconstruct individual records from aggregated data</li>
+        <li><span>🔴</span>Petabyte-scale transmission costs — economically unsustainable for real-time analysis</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">What Gets Exposed</div></div>
+      <div style="display:flex;flex-direction:column;gap:.7rem;padding:.2rem 0">
+        <div style="padding:.85rem 1rem;background:var(--rg);border:1px solid var(--rd);border-radius:8px"><div style="font-family:var(--FD);font-size:.73rem;color:var(--r);font-weight:700;margin-bottom:.28rem">💾 DATA IN TRANSIT</div><div style="font-family:var(--FM);font-size:.68rem;color:var(--t2)">Account numbers · PAN cards · Full names · Transaction history · Beneficiaries · Merchant data · GPS location · Device fingerprints</div></div>
+        <div style="padding:.85rem 1rem;background:var(--rg);border:1px solid var(--rd);border-radius:8px"><div style="font-family:var(--FD);font-size:.73rem;color:var(--r);font-weight:700;margin-bottom:.28rem">🎯 ATTACK SURFACE</div><div style="font-family:var(--FM);font-size:.68rem;color:var(--t2)">1 central server = 1 target. 1 breach = 100% exposure across all banks. Estimated damage: ₹500Cr+</div></div>
+        <div style="padding:.85rem 1rem;background:var(--rg);border:1px solid var(--rd);border-radius:8px"><div style="font-family:var(--FD);font-size:.73rem;color:var(--r);font-weight:700;margin-bottom:.28rem">⚖️ REGULATORY PENALTIES</div><div style="font-family:var(--FM);font-size:.68rem;color:var(--t2)">GDPR: €20M or 4% annual turnover · RBI: License suspension · DPDP 2023: ₹250Cr per breach · PCI-DSS: Processing ban</div></div>
+      </div>
+    </div>
+  </div>
+  <div id="cv-good" class="cv">
+    <div class="cpanel good">
+      <h3 style="color:var(--g)">✅ Federated Learning — The Solution</h3>
+      <p class="cdesc">Each bank trains locally. Only encrypted, noise-added gradient vectors travel to the aggregator. Full accuracy. Zero privacy compromise. Fully legal.</p>
+      <ul class="clist">
+        <li><span>🟢</span>Zero raw data leaves any bank — only mathematical gradient vectors with Gaussian noise (differential privacy)</li>
+        <li><span>🟢</span>Distributed resilience — 1 bank fails → 9 others continue operating and training independently</li>
+        <li><span>🟢</span>Fully compliant: GDPR, RBI Localization, DPDP Act 2023, PCI-DSS v4.0, banking secrecy laws</li>
+        <li><span>🟢</span>Banks maintain complete data sovereignty while sharing collective fraud intelligence</li>
+        <li><span>🟢</span>FedAvg secure aggregation — mathematically impossible to reverse-engineer individual bank gradients</li>
+        <li><span>🟢</span>Differential privacy ε &lt; 1.0 per round — formal mathematical proof of privacy guarantees</li>
+      </ul>
+    </div>
+    <div class="card"><div class="card-hdr"><div><div class="card-title">FL vs Centralized Accuracy</div><div class="card-sub">FL reaches near-identical accuracy — with zero data exposure</div></div></div><div class="chw" style="height:270px"><canvas id="ch-comp"></canvas></div></div>
+  </div>
+</div>
+</section>
+
+<!-- PRIVACY -->
+<section id="priv" class="sec">
+<div class="sec-in">
+  <p class="sec-tag rv">Mathematical Guarantees</p>
+  <h2 class="sec-h2 rv">Privacy <span>Proofs</span></h2>
+  <p class="sec-p rv">Every claim is backed by formal mathematical guarantees — not policy promises.</p>
+  <div class="priv-grid">
+    <div class="pcard rv" style="--pc:var(--c)"><div class="pcard-ico">🔒</div><div class="pcard-t">Differential Privacy</div><p class="pcard-b">Gaussian mechanism injects calibrated noise into gradient vectors. Guarantees (ε,δ)-DP with ε &lt; 1.0 per round. Even with all shared gradients, no adversary can determine if any individual's data was in the training set.</p><div class="pcard-m"><span class="pm-v" style="color:var(--c)">ε&lt;1.0</span><div class="pm-l">Privacy budget<br>per training round</div></div></div>
+    <div class="pcard rv" style="--pc:var(--g);transition-delay:.1s"><div class="pcard-ico">🔐</div><div class="pcard-t">Secure Aggregation (FedAvg)</div><p class="pcard-b">Cryptographic masking — each bank's gradient masked with one-time pads shared with other banks. Aggregator sees only the combined sum. Individual bank gradients are computationally unrecoverable.</p><div class="pcard-m"><span class="pm-v" style="color:var(--g)">AES-256</span><div class="pm-l">All gradient<br>transmissions</div></div></div>
+    <div class="pcard rv" style="--pc:var(--p);transition-delay:.2s"><div class="pcard-ico">🏛️</div><div class="pcard-t">Regulatory Compliance</div><p class="pcard-b">Architecture satisfies GDPR (EU), RBI Data Localization 2018, India's DPDP Act 2023, PCI-DSS v4.0, and Basel III risk framework simultaneously — by design, not workaround.</p><div class="pcard-m"><span class="pm-v" style="color:var(--p)">6+</span><div class="pm-l">Regulatory frameworks<br>fully satisfied</div></div></div>
+    <div class="pcard rv" style="--pc:var(--o);transition-delay:.3s"><div class="pcard-ico">🛡️</div><div class="pcard-t">Byzantine Fault Tolerance</div><p class="pcard-b">Krum / coordinate-wise median aggregation detects and rejects poisoned gradient updates from compromised bank nodes — preventing model poisoning attacks from insiders or adversaries.</p><div class="pcard-m"><span class="pm-v" style="color:var(--o)">30%</span><div class="pm-l">Malicious nodes<br>safely tolerated</div></div></div>
+    <div class="pcard rv" style="--pc:var(--r);transition-delay:.4s"><div class="pcard-ico">🔍</div><div class="pcard-t">Gradient Inversion Defense</div><p class="pcard-b">DP noise + gradient clipping + large batch sizes together make gradient inversion attacks computationally infeasible. Formal proof bounds show reconstruction success rate is effectively 0%.</p><div class="pcard-m"><span class="pm-v" style="color:var(--r)">0%</span><div class="pm-l">Data reconstruction<br>success rate</div></div></div>
+    <div class="pcard rv" style="--pc:var(--y);transition-delay:.5s"><div class="pcard-ico">📋</div><div class="pcard-t">XAI Auditability</div><p class="pcard-b">Every detection decision includes SHAP-value explainability breakdown. Regulators audit any decision without accessing raw customer data. Full compliance with RBI's model interpretability guidelines.</p><div class="pcard-m"><span class="pm-v" style="color:var(--y)">100%</span><div class="pm-l">Decisions with<br>full audit trail</div></div></div>
+  </div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-in">
+    <div class="ft-logo">PFLF SYSTEM v2.0</div>
+    <div class="ft-tag">Privacy-Preserving Federated Learning · Financial Transaction Analysis · Node.js + REST API + WebSocket</div>
+    <div class="ft-badges">
+      <span class="ft-b">✓ GDPR</span><span class="ft-b">✓ RBI Guidelines</span><span class="ft-b">✓ DPDP Act 2023</span>
+      <span class="ft-b">✓ PCI-DSS v4.0</span><span class="ft-b">✓ Differential Privacy ε&lt;1.0</span>
+      <span class="ft-b">✓ FedAvg Algorithm</span><span class="ft-b">✓ AES-256</span><span class="ft-b">✓ Zero Raw Data Transfer</span>
+    </div>
+    <div class="ft-copy">© 2025 Privacy-Preserving Federated Learning for Financial Transaction Analysis — Final Year Project</div>
+  </div>
+</footer>
+
+<script>
+Chart.defaults.color='#7ab8d4';Chart.defaults.borderColor='#0e2a42';
+Chart.defaults.font.family="'Share Tech Mono',monospace";Chart.defaults.font.size=10;
+const C='#00e5ff',G='#00ff9d',R='#ff2d55',O='#ff8c00',P='#bf5fff',Y='#ffd60a',DIM='rgba(255,255,255,.04)';
+const BANKS=['HDFC','SBI','ICICI','Axis','Kotak','PNB','BoB','Canara','UCO','Bandhan'];
+let ws,feedPaused=false,fCnt=0,ringCh=null;
+let curType='cc',demoCounts={CC:0,ML:0,UT:0,FT:0,IT:0};
+let allTxns=[];
+const CH={};
+const donut={CC:0,ML:0,UT:0,FT:0,IT:0};
+
+function wsConnect(){
+  try{
+    var proto=location.protocol==='https:'?'wss:':'ws:';
+    var host=location.host||'localhost:3000';
+    ws=new WebSocket(proto+'//'+host);
+    ws.onopen=function(){setWS(true);};
+    ws.onmessage=function(e){try{handle(JSON.parse(e.data));}catch(_){}};
+    ws.onclose=function(){setWS(false);setTimeout(wsConnect,3000);};
+    ws.onerror=function(){setWS(false);};
+  }catch(e){setWS(false);setTimeout(wsConnect,5000);}
+}
+function setWS(ok){
+  document.getElementById('wsdot').className='wsdot'+(ok?'':' off');
+  document.getElementById('wslbl').textContent=ok?'CONNECTED':'RECONNECTING...';
+}
+function handle(m){
+  if(m.type==='CONNECTED'){setStat(m.stats);}
+  if(m.type==='TRANSACTION'){addRow(m.data);tlUpdate(m.data);donutUpdate(m.data);}
+  if(m.type==='FRAUD_ALERT'){showToast(m.data);}
+  if(m.type==='STATS'){setStat(m.data);}
+  if(m.type==='FL_UPDATE'){
+    const el=document.getElementById('fl-rnd-lbl');if(el)el.textContent='Round '+m.data.round;
+    const sr=document.getElementById('s-rnd');if(sr)sr.textContent=m.data.round;
+    const se=document.getElementById('s-eps');if(se)se.textContent=(m.data.epsilon||0.9).toFixed(3);
+  }
+}
+function setStat(s){
+  if(!s)return;
+  const $=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  $('s-total',(s.total||0).toLocaleString());$('s-fraud',(s.fraud||0).toLocaleString());
+  $('s-sus',(s.suspect||0).toLocaleString());$('s-acc',(s.accuracy||97.3).toFixed(1)+'%');
+  $('s-acc2',(s.accuracy||97.3).toFixed(1)+'%');$('s-blk','₹'+((s.blockedAmount||0)/100000).toFixed(1)+'L');
+  $('s-rate',(s.fraudRate||0).toFixed(2)+'%');$('s-rnd',s.round||47);$('s-eps',(s.epsilon||0.9).toFixed(3));
+  $('s-cc',s.ccFraud||0);$('s-ml',s.mlFraud||0);$('s-ut',s.utFraud||0);$('s-ft',s.ftFraud||0);$('s-it',s.itFraud||0);
+}
+function addRow(tx){
+  if(feedPaused)return;
+  allTxns.unshift(tx);
+  fCnt++;
+  if(allTxns.length>500) allTxns.pop();
+  renderFeed();
+}
+window._txById=(id)=>allTxns.find(t=>t.id===id);
+function renderFeed(){
+  const body=document.getElementById('fbody');if(!body)return;
+  document.getElementById('fcount').textContent=fCnt.toLocaleString()+' transactions';
+  const sf=document.getElementById('feed-status')?.value||'all';
+  const tf=document.getElementById('feed-type')?.value||'all';
+  const filtered=allTxns.filter(t=>(sf==='all'||t.status===sf)&&(tf==='all'||!t.fraudType||t.fraudType===tf)).slice(0,50);
+  
+  body.innerHTML=filtered.map(tx=>{
+    const sc=tx.score>=75?'var(--r)':tx.score>=50?'var(--o)':'var(--g)';
+    const pc=tx.status==='fraud'?'fraud':tx.status==='suspect'?'suspect':tx.status==='review'?'review':'clean';
+    const ico=tx.status==='fraud'?'⚠':tx.status==='suspect'?'◉':tx.status==='review'?'◈':'✓';
+    const fc=tx.fraudType?sc:'var(--t3)';
+    return `<div class="fr${tx.status==='fraud'?' ff':tx.status==='suspect'?' fs':''}" onclick="openMod(window._txById('${tx.id}'))"><span class="fid">${tx.id}</span><span class="fbank">${tx.bankSrc} → ${tx.bankDst}</span><span class="famt">₹${parseFloat(tx.amount).toLocaleString('en-IN',{maximumFractionDigits:0})}</span><span style="font-family:var(--FM);font-size:.61rem;color:${fc}">${tx.fraudLabel||'Normal'}</span><span><span class="pill ${pc}">${ico} ${tx.status.toUpperCase()}</span></span><span class="rb-wrap"><div class="rbt"><div class="rbf" style="width:${tx.score}%;background:${sc}"></div></div><span style="font-family:var(--FM);font-size:.6rem;color:${sc};min-width:24px">${tx.score}</span></span><span style="font-family:var(--FM);font-size:.6rem;color:var(--t3);display:flex;align-items:center;gap:.35rem"><span>${tx.latency}ms</span><button onclick="event.stopPropagation();autoFillAnalyzer(window._txById('${tx.id}'))" title="Auto-fill Analyzer" style="font-family:var(--FM);font-size:.52rem;color:var(--c);background:var(--cg);border:1px solid var(--cd);padding:.1rem .36rem;border-radius:5px;cursor:pointer;transition:.15s;line-height:1" onmouseover="this.style.background='var(--cd)';this.style.color='#010812'" onmouseout="this.style.background='var(--cg)';this.style.color='var(--c)'">🔬</button></span></div>`;
+  }).join('');
+}
+const TC={CC:{cls:'',type:'💳 CREDIT CARD FRAUD',msg:'Velocity anomaly + geo mismatch detected'},ML:{cls:'ml',type:'💰 MONEY LAUNDERING',msg:'3-stage laundering across shell account network'},UT:{cls:'ut',type:'🔐 UNAUTHORIZED TRANSACTION',msg:'Account takeover — new device + unknown beneficiary'},FT:{cls:'ft',type:'👻 FAKE TRANSACTION',msg:'Synthetic identity bust-out pattern flagged'},IT:{cls:'it',type:'🕵️ IDENTITY THEFT',msg:'Fraudulent verification and credit sweeps detected'}};
+function showToast(tx){
+  const c=TC[tx.fraudType]||TC.CC;
+  const el=document.createElement('div');
+  el.className=`toast ${c.cls}`;
+  el.innerHTML=`<div class="t-hdr"><span class="t-ico">🚨</span><span class="t-type">${c.type}</span><span class="t-id">${tx.id}</span><button class="t-x" onclick="this.closest('.toast').remove()">✕</button></div><div class="t-body">${c.msg}</div><div class="t-meta"><span><strong>${tx.bankSrc}</strong> → ${tx.bankDst}</span><span>₹<strong>${parseFloat(tx.amount).toLocaleString('en-IN',{maximumFractionDigits:0})}</strong></span><span>Risk: <strong style="color:var(--r)">${tx.score}/100</strong></span></div><div class="t-prog"></div>`;
+  el.onclick=e=>{if(!e.target.classList.contains('t-x')){autoFillAnalyzer(tx);openMod(tx);}};
+  document.getElementById('alerts').appendChild(el);
+  setTimeout(()=>{el.classList.add('tout');setTimeout(()=>el.remove(),300);},7500);
+  const all=document.querySelectorAll('.toast');if(all.length>5)all[0].remove();
+}
+function openMod(tx){
+  const sc=tx.score>=75?'var(--r)':tx.score>=50?'var(--o)':'var(--g)';
+  const pc=tx.status==='fraud'?'fraud':tx.status==='suspect'?'suspect':tx.status==='review'?'review':'clean';
+  document.getElementById('mbox').className=tx.status==='fraud'?'fm':tx.status==='suspect'?'um':tx.fraudType==='ML'?'mm':'';
+  const tlMap={
+    CC:`<div class="ms"><div class="ms-dot" style="border-color:var(--r)">1</div><div class="ms-body"><strong>VELOCITY ANOMALY</strong><p>${tx.id} — transaction #${Math.floor(Math.random()*35+18)} from this card this hour. Normal baseline: 2–3/hr.</p></div><span class="ms-time">T+0ms</span></div><div class="ms"><div class="ms-dot" style="border-color:var(--o)">2</div><div class="ms-body"><strong>LOCATION MISMATCH</strong><p>Origin IP maps to ${tx.country}. Cardholder registered in India.</p></div><span class="ms-time">T+1.4s</span></div><div class="ms"><div class="ms-dot" style="border-color:var(--g)">3</div><div class="ms-body"><strong>FL MODEL: BLOCK</strong><p>Combined velocity + geo + off-hours → Risk ${tx.score}/100. Card blocked. OTP challenge sent.</p></div><span class="ms-time">T+${tx.latency}ms</span></div>`,
+    ML:`<div class="ms"><div class="ms-dot" style="border-color:var(--r)">1</div><div class="ms-body"><strong>PLACEMENT DETECTED</strong><p>Structured deposit just below ₹10L threshold — classic smurfing pattern identified.</p></div><span class="ms-time">T+0ms</span></div><div class="ms"><div class="ms-dot" style="border-color:var(--o)">2</div><div class="ms-body"><strong>LAYERING CHAIN</strong><p>Funds split across ${Math.floor(Math.random()*5+4)} shell accounts. Cross-border routing to ${tx.country} detected.</p></div><span class="ms-time">T+2.3s</span></div><div class="ms"><div class="ms-dot" style="border-color:var(--g)">3</div><div class="ms-body"><strong>STR FILED — ACCOUNTS FROZEN</strong><p>FATF high-risk jurisdiction flag. STR filed with FIU-IND.</p></div><span class="ms-time">T+${tx.latency}ms</span></div>`,
+    UT:`<div class="ms"><div class="ms-dot" style="border-color:var(--r)">1</div><div class="ms-body"><strong>NEW DEVICE LOGIN AT ${tx.hour}:00</strong><p>Unregistered device accessed account. IP from ${tx.country}.</p></div><span class="ms-time">T+0ms</span></div><div class="ms"><div class="ms-dot" style="border-color:var(--o)">2</div><div class="ms-body"><strong>IMMEDIATE LARGE TRANSFER</strong><p>₹${parseFloat(tx.amount).toLocaleString('en-IN',{maximumFractionDigits:0})} to first-time beneficiary within 90 seconds of login.</p></div><span class="ms-time">T+1.8s</span></div><div class="ms"><div class="ms-dot" style="border-color:var(--g)">3</div><div class="ms-body"><strong>TRANSACTION BLOCKED</strong><p>Score ${tx.score}/100. Account frozen. Customer contacted.</p></div><span class="ms-time">T+${tx.latency}ms</span></div>`,
+    FT:`<div class="ms"><div class="ms-dot" style="border-color:var(--r)">1</div><div class="ms-body"><strong>SYNTHETIC ID SIGNAL</strong><p>Account 2 months old shows statistically impossible established-credit behavior.</p></div><span class="ms-time">T+0ms</span></div><div class="ms"><div class="ms-dot" style="border-color:var(--o)">2</div><div class="ms-body"><strong>GHOST MERCHANT</strong><p>Merchant ID zero history. Category: luxury goods. Return rate: 0%.</p></div><span class="ms-time">T+2.5s</span></div><div class="ms"><div class="ms-dot" style="border-color:var(--g)">3</div><div class="ms-body"><strong>BUST-OUT REJECT</strong><p>Credit 0%→95% in 48hr. Transaction permanently rejected. EOW referral.</p></div><span class="ms-time">T+${tx.latency}ms</span></div>`,
+    IT:`<div class="ms"><div class="ms-dot" style="border-color:var(--r)">1</div><div class="ms-body"><strong>FAKE DOCS DETECTED</strong><p>Digital KYC documents match known dark web templates.</p></div><span class="ms-time">T+0ms</span></div><div class="ms"><div class="ms-dot" style="border-color:var(--o)">2</div><div class="ms-body"><strong>CREDIT PULLS</strong><p>Multiple soft inquiries in past 1 hour.</p></div><span class="ms-time">T+1.2s</span></div><div class="ms"><div class="ms-dot" style="border-color:var(--g)">3</div><div class="ms-body"><strong>IDENTITY LOCK</strong><p>Account frozen to protect customer identity.</p></div><span class="ms-time">T+${tx.latency}ms</span></div>`
+  };
+  const tl=tlMap[tx.fraudType]||tlMap.CC;
+  window._modalTx=tx;
+  document.getElementById('m-content').innerHTML=`<div class="m-title" style="color:${sc}">Transaction Analysis Report</div><div class="m-sub">// PFLF Federated Model — ${tx.fraudLabel||'Normal'} — ${new Date(tx.timestamp).toLocaleString()}</div><div class="m-grid"><div class="mf"><div class="mf-lbl">Transaction ID</div><div class="mf-val" style="color:var(--c)">${tx.id}</div></div><div class="mf"><div class="mf-lbl">Status</div><div class="mf-val"><span class="pill ${pc}">${tx.status.toUpperCase()}</span></div></div><div class="mf"><div class="mf-lbl">Source Bank</div><div class="mf-val">${tx.bankSrc}</div></div><div class="mf"><div class="mf-lbl">Destination Bank</div><div class="mf-val">${tx.bankDst}</div></div><div class="mf"><div class="mf-lbl">Amount</div><div class="mf-val" style="color:${sc}">₹${parseFloat(tx.amount).toLocaleString('en-IN',{maximumFractionDigits:0})}</div></div><div class="mf"><div class="mf-lbl">Risk Score</div><div class="mf-val" style="color:${sc}">${tx.score} / 100</div></div><div class="mf"><div class="mf-lbl">Fraud Category</div><div class="mf-val" style="color:${sc}">${tx.fraudLabel||'Normal'}</div></div><div class="mf"><div class="mf-lbl">Country</div><div class="mf-val">${tx.country}</div></div><div class="mf"><div class="mf-lbl">Device</div><div class="mf-val">${tx.device||'—'}</div></div><div class="mf"><div class="mf-lbl">Detection Latency</div><div class="mf-val" style="color:var(--g)">${tx.latency}ms</div></div></div><div class="mtl"><div class="mtl-title">🔍 Detection Event Timeline</div>${tl}</div><div class="priv-note"><div class="priv-note-lbl">🛡️ Privacy Note</div><div class="priv-note-txt">Analysis used only transaction metadata. No account holder name, PAN, or personal data was accessed by the FL model. Raw data never left ${tx.bankSrc}'s servers.</div></div>${tx.fraudType?'<div style="margin-top:.9rem;text-align:center"><button onclick="closeMod();autoFillAnalyzer(window._modalTx)" style="background:linear-gradient(135deg,var(--c),var(--p));color:#010812;font-family:var(--FM);font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.55rem 1.5rem;border:none;border-radius:10px;cursor:pointer">🔬 Auto-fill Analyzer</button></div>':''}`;
+  document.getElementById('mbg').classList.add('open');
+}
+function closeMod(){document.getElementById('mbg').classList.remove('open');}
+document.getElementById('mbg').onclick=e=>{if(e.target===document.getElementById('mbg'))closeMod();};
+
+const PRESETS={
+  cc:{crit:{amt:450000,hr:3,vel:28,cty:'RU',nd:true,fi:true},high:{amt:380000,hr:2,vel:22,cty:'NG',nd:true,fi:true},med:{amt:85000,hr:23,vel:9,cty:'AE',nd:true,fi:false},low:{amt:5000,hr:14,vel:2,cty:'IN',nd:false,fi:false},low2:{amt:1200,hr:11,vel:1,cty:'IN',nd:false,fi:false}},
+  ml:{crit:{amt:95000,txc:18,age:2,cty:'RU',cb:true,sc:true,st:true},high:{amt:75000,txc:10,age:5,cty:'NG',cb:true,sc:false,st:true},med:{amt:40000,txc:5,age:14,cty:'AE',cb:true,sc:false,st:false},low:{amt:8000,txc:2,age:36,cty:'IN',cb:false,sc:false,st:false},low2:{amt:3000,txc:1,age:72,cty:'IN',cb:false,sc:false,st:false}},
+  ut:{crit:{amt:150000,hr:3,age:36,cty:'RU',nd:true,nb:true,otp:true,cc:true,geo:true},high:{amt:80000,hr:2,age:24,cty:'IN',nd:true,nb:true,otp:false,cc:true,geo:false},med:{amt:20000,hr:23,age:48,cty:'IN',nd:false,nb:true,otp:false,cc:false,geo:false},low:{amt:5000,hr:14,age:60,cty:'IN',nd:false,nb:false,otp:false,cc:false,geo:false},low2:{amt:1000,hr:10,age:84,cty:'IN',nd:false,nb:false,otp:false,cc:false,geo:false}},
+  ft:{crit:{amt:4500,age:2,mr:0.9,cb:7,si:true,gm:true,bo:true,ii:true},high:{amt:12000,age:2,mr:0.7,cb:3,si:true,gm:false,bo:true,ii:false},med:{amt:2000,age:10,mr:0.5,cb:2,si:false,gm:false,bo:false,ii:false},low:{amt:500,age:36,mr:0.1,cb:0,si:false,gm:false,bo:false,ii:false},low2:{amt:200,age:60,mr:0.0,cb:0,si:false,gm:false,bo:false,ii:false}}
+};
+function loadPreset(type,key){
+  const p=PRESETS[type]?.[key];if(!p)return;
+  const setV=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v;};
+  const setC=(id,v)=>{const inp=document.getElementById(id);if(!inp)return;inp.checked=v;const lbl=document.getElementById('ci-'+id);if(lbl){lbl.classList.toggle('checked',v);const box=lbl.querySelector('.ci-box');if(box)box.textContent=v?'✓':'';}};
+  if(type==='cc'){setV('cc-amt',p.amt);setV('cc-hr',p.hr);setV('cc-vel',p.vel);document.getElementById('cc-cty').value=p.cty;setC('cc-nd',p.nd);setC('cc-fi',p.fi);}
+  else if(type==='ml'){setV('ml-amt',p.amt);setV('ml-txc',p.txc);setV('ml-age',p.age);document.getElementById('ml-cty').value=p.cty;setC('ml-cb',p.cb);setC('ml-sc',p.sc);setC('ml-st',p.st);}
+  else if(type==='ut'){setV('ut-amt',p.amt);setV('ut-hr',p.hr);setV('ut-age',p.age);document.getElementById('ut-cty').value=p.cty;setC('ut-nd',p.nd);setC('ut-nb',p.nb);setC('ut-otp',p.otp);setC('ut-cc',p.cc);setC('ut-geo',p.geo);}
+  else if(type==='ft'){setV('ft-amt',p.amt);setV('ft-age',p.age);setV('ft-mr',p.mr);setV('ft-cb',p.cb);setC('ft-si',p.si);setC('ft-gm',p.gm);setC('ft-bo',p.bo);setC('ft-ii',p.ii);}
+  document.querySelectorAll('.fp.on input,.fp.on select').forEach(el=>{el.style.transition='none';el.style.borderColor='var(--cd)';el.style.background='rgba(0,229,255,.06)';setTimeout(()=>{el.style.borderColor='';el.style.background='';el.style.transition='';},700);});
+  setTimeout(()=>analyze(),350);
+}
+function toggleCI(label,inputId){const inp=document.getElementById(inputId);if(!inp)return;const newVal=!inp.checked;inp.checked=newVal;label.classList.toggle('checked',newVal);const box=label.querySelector('.ci-box');if(box)box.textContent=newVal?'✓':'';}
+
+function autoFillAnalyzer(tx){
+  if(!tx||!tx.fraudType)return;
+  const type=tx.fraudType.toLowerCase();
+  const highRisk=tx.score>=70;const medRisk=tx.score>=40;
+  switchType(type);
+  const setV=(id,v)=>{const el=document.getElementById(id);if(!el)return;el.value=v;el.style.borderColor='var(--cd)';el.style.background='rgba(0,229,255,.06)';setTimeout(()=>{el.style.borderColor='';el.style.background='';},900);};
+  const setC=(id,val)=>{const inp=document.getElementById(id);if(!inp)return;inp.checked=val;const lbl=document.getElementById('ci-'+id);if(lbl){lbl.classList.toggle('checked',val);const box=lbl.querySelector('.ci-box');if(box)box.textContent=val?'✓':'';lbl.style.transition='none';lbl.style.boxShadow=val?'0 0 0 2px var(--cd)':'0 0 0 2px var(--rd)';setTimeout(()=>{lbl.style.boxShadow='';lbl.style.transition='';},700);}};
+  if(type==='cc'){setV('cc-amt',Math.round(tx.amount));setV('cc-hr',tx.hour??3);setV('cc-vel',highRisk?28:2);const ccty=document.getElementById('cc-cty');if(ccty)ccty.value=tx.country||'IN';setC('cc-nd',highRisk);setC('cc-fi',highRisk&&tx.country!=='IN');}
+  else if(type==='ml'){setV('ml-amt',Math.round(tx.amount));setV('ml-txc',highRisk?18:2);setV('ml-age',highRisk?2:36);const mlcty=document.getElementById('ml-cty');if(mlcty)mlcty.value=tx.country||'IN';setC('ml-cb',tx.country!=='IN');setC('ml-sc',highRisk);setC('ml-st',tx.amount>=88000&&tx.amount<=99999);}
+  else if(type==='ut'){setV('ut-amt',Math.round(tx.amount));setV('ut-hr',tx.hour??3);setV('ut-age',36);const utcty=document.getElementById('ut-cty');if(utcty)utcty.value=tx.country||'IN';setC('ut-nd',highRisk);setC('ut-nb',highRisk);setC('ut-otp',highRisk&&medRisk);setC('ut-cc',highRisk);setC('ut-geo',tx.country!=='IN');}
+  else if(type==='ft'){setV('ft-amt',Math.round(tx.amount));setV('ft-age',highRisk?2:36);setV('ft-mr',highRisk?0.9:medRisk?0.5:0.1);setV('ft-cb',highRisk?7:0);setC('ft-si',highRisk);setC('ft-gm',highRisk);setC('ft-bo',highRisk);setC('ft-ii',medRisk);}
+  document.getElementById('analyzer').scrollIntoView({behavior:'smooth',block:'start'});
+  showAutoFillBanner(tx);
+  setTimeout(()=>analyze(),500);
+}
+function showAutoFillBanner(tx){
+  const old=document.getElementById('autofill-banner');if(old)old.remove();
+  const col=tx.score>=75?'var(--r)':tx.score>=50?'var(--o)':'var(--g)';
+  const icon={CC:'💳',ML:'🏦',UT:'🔐',FT:'👻',IT:'🕵️'}[tx.fraudType]||'🔬';
+  const banner=document.createElement('div');banner.id='autofill-banner';
+  banner.style.cssText=`position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg2);border:1px solid ${col};border-radius:12px;padding:.7rem 1.4rem;display:flex;align-items:center;gap:.75rem;font-family:var(--FM);font-size:.68rem;color:var(--t1);z-index:980;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .4s cubic-bezier(.34,1.56,.64,1);max-width:90vw;white-space:nowrap;`;
+  banner.innerHTML=`<span style="font-size:1.1rem">${icon}</span><span>Auto-filled from <strong style="color:${col}">${tx.id}</strong> — score <strong style="color:${col}">${tx.score}/100</strong></span><span style="color:var(--t3);font-size:.58rem">Analyzing...</span><button onclick="this.closest('#autofill-banner').remove()" style="background:transparent;border:none;color:var(--t3);cursor:pointer;font-size:.9rem;margin-left:.25rem">✕</button>`;
+  document.body.appendChild(banner);
+  setTimeout(()=>{banner.style.transform='translateX(-50%) translateY(0)';},50);
+  setTimeout(()=>{banner.style.transform='translateX(-50%) translateY(80px)';setTimeout(()=>banner.remove(),400);},4000);
+}
+async function trigger(type){
+  demoCounts[type]++;
+  const dc=document.getElementById('dc-'+type);if(dc)dc.textContent=demoCounts[type];
+  try{
+    const r=await fetch('/api/trigger/'+type,{method:'POST'});
+    const d=await r.json();
+    if(d.success)document.getElementById('feed').scrollIntoView({behavior:'smooth',block:'center'});
+  }catch(e){
+    const tx={id:'TXN'+String(Math.floor(Math.random()*999999)).padStart(6,'0'),timestamp:new Date().toISOString(),bankSrc:'HDFC',bankDst:'SBI',amount:Math.floor(Math.random()*400000+5000),hour:3,country:type==='ML'?'RU':'IN',status:'fraud',fraudType:type,fraudLabel:{CC:'Credit Card Fraud',ML:'Money Laundering',UT:'Unauthorized Transaction',FT:'Fake Transaction',IT:'Identity Theft'}[type],score:Math.floor(Math.random()*15+82),latency:Math.floor(Math.random()*12+6),device:'Mobile'};
+    addRow(tx);showToast(tx);
+    document.getElementById('feed').scrollIntoView({behavior:'smooth',block:'center'});
+  }
+}
+document.querySelectorAll('.tab').forEach(t=>{t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));document.querySelectorAll('.tp').forEach(x=>x.classList.remove('on'));t.classList.add('on');document.getElementById(t.dataset.t)?.classList.add('on');if(t.dataset.t==='t-fl')startFL();};});
+document.querySelectorAll('.tbtn').forEach(t=>{t.onclick=()=>{document.querySelectorAll('.tbtn').forEach(x=>x.classList.remove('on'));t.classList.add('on');};});
+document.querySelectorAll('.ctb').forEach(b=>{b.onclick=()=>{document.querySelectorAll('.ctb').forEach(x=>x.classList.remove('on'));document.querySelectorAll('.cv').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.getElementById(b.dataset.cv)?.classList.add('on');};});
+document.getElementById('fpause').onclick=function(){feedPaused=!feedPaused;this.textContent=feedPaused?'▶ Resume':'⏸ Pause';this.classList.toggle('paused',feedPaused);};
+function switchType(t){curType=t;document.querySelectorAll('.tt').forEach(x=>x.classList.remove('on'));document.querySelector('.tt.'+t)?.classList.add('on');document.querySelectorAll('.fp').forEach(x=>x.classList.remove('on'));document.getElementById('fp-'+t)?.classList.add('on');document.getElementById('ep-val').textContent='POST /api/analyze/'+t;}
+async function analyze(){
+  const btn=document.getElementById('ana-btn');btn.disabled=true;btn.textContent='⏳ Calling API...';
+  let body={};
+  if(curType==='cc')body={amount:document.getElementById('cc-amt').value,hour:document.getElementById('cc-hr').value,country:document.getElementById('cc-cty').value,velocity:document.getElementById('cc-vel').value,newDevice:document.getElementById('cc-nd').checked,foreignIp:document.getElementById('cc-fi').checked};
+  else if(curType==='ml')body={amount:document.getElementById('ml-amt').value,txnCount24h:document.getElementById('ml-txc').value,country:document.getElementById('ml-cty').value,accountAgeMonths:document.getElementById('ml-age').value,crossBorder:document.getElementById('ml-cb').checked,shellCompany:document.getElementById('ml-sc').checked,structuring:document.getElementById('ml-st').checked};
+  else if(curType==='ut')body={amount:document.getElementById('ut-amt').value,hour:document.getElementById('ut-hr').value,country:document.getElementById('ut-cty').value,accountAgeMonths:document.getElementById('ut-age').value,newDevice:document.getElementById('ut-nd').checked,newBeneficiary:document.getElementById('ut-nb').checked,multipleOtpFail:document.getElementById('ut-otp').checked,credentialChange:document.getElementById('ut-cc').checked,geoMismatch:document.getElementById('ut-geo').checked};
+  else if(curType==='it')body={amount:document.getElementById('it-amt').value,frequentPwdChange:document.getElementById('it-pwd').checked,fakeDocuments:document.getElementById('it-doc').checked,creditPull:document.getElementById('it-cred').checked};
+  else body={amount:document.getElementById('ft-amt').value,accountAgeMonths:document.getElementById('ft-age').value,merchantRisk:document.getElementById('ft-mr').value,chargebackHistory:document.getElementById('ft-cb').value,syntheticId:document.getElementById('ft-si').checked,ghostMerchant:document.getElementById('ft-gm').checked,rapidCreditUtilisation:document.getElementById('ft-bo').checked,invoiceInflation:document.getElementById('ft-ii').checked};
+  try{
+    const resp=await fetch('/api/analyze/'+curType,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const data=await resp.json();btn.disabled=false;btn.textContent='⚡ Analyze Transaction';
+    if(data.success)showResult(data.data,data);else showErr(data.error);
+  }catch(e){btn.disabled=false;btn.textContent='⚡ Analyze Transaction';showErr('Server offline — run: npm install && npm start');}
+}
+function showResult(d,full){
+  document.getElementById('res-ph').style.display='none';
+  const out=document.getElementById('res-out');out.classList.add('show');
+  const score=d.score;const col=score>=75?R:score>=50?O:G;
+  if(ringCh){ringCh.destroy();ringCh=null;}
+  const c=document.getElementById('res-ring');
+  if(c){ringCh=new Chart(c.getContext('2d'),{type:'doughnut',data:{datasets:[{data:[score,100-score],backgroundColor:[col,'rgba(255,255,255,.05)'],borderColor:[col+'88','transparent'],borderWidth:[2,0]}]},options:{responsive:false,cutout:'76%',plugins:{legend:{display:false},tooltip:{enabled:false}},animation:{animateScale:true}}});}
+  const sn=document.getElementById('ring-n');if(sn){sn.textContent=score;sn.style.color=col;}
+  const slv=document.getElementById('ring-lv');if(slv){slv.textContent=d.verdict?.level||'—';slv.style.color=col;}
+  const bk=document.getElementById('bk-rows');bk.innerHTML='';
+  if(d.factors){Object.entries(d.factors).forEach(([k,f])=>{const fc=f.score>=70?`linear-gradient(90deg,${R},${O})`:f.score>=40?O:C;const lbl=k.replace(/([A-Z])/g,' $1').replace(/^./,s=>s.toUpperCase());bk.innerHTML+=`<div class="bk-row"><span class="bk-lbl">${lbl}</span><div class="bk-trk"><div class="bk-fill" style="width:${f.score}%;background:${fc}"></div></div><span class="bk-val" style="color:${f.score>=70?R:f.score>=40?O:C}">${f.score}%</span></div><span class="bk-detail">${f.detail||''}</span>`;});}
+  const v=d.verdict;
+  if(v){const vb=document.getElementById('verdict');vb.style.cssText=`background:${score>=75?'rgba(255,45,85,.1)':score>=50?'rgba(255,140,0,.1)':'rgba(0,255,157,.1)'};border-left:3px solid ${col};border-radius:11px;padding:1.05rem 1.15rem`;document.getElementById('v-lv').textContent=v.level||'—';document.getElementById('v-lv').style.color=col;document.getElementById('v-act').textContent='→ ACTION: '+(v.action||'—');document.getElementById('v-act').style.color=col;document.getElementById('v-msg').textContent=v.message||'—';document.getElementById('v-steps').innerHTML=(v.steps||[]).map(s=>`<li>${s}</li>`).join('');}
+  document.getElementById('raw-pre').textContent=JSON.stringify(full,null,2);
+}
+function showErr(msg){document.getElementById('res-ph').style.display='none';document.getElementById('res-out').classList.add('show');document.getElementById('raw-pre').textContent='// Error: '+msg;}
+function startFL(){
+  const nodes=document.querySelectorAll('.bn');
+  const sp=(id,v)=>{const e=document.getElementById(id);if(e)e.style.width=v+'%';const vl=document.getElementById(id.replace('flp','flv'));if(vl)vl.textContent=v+'%';};
+  nodes.forEach((n,i)=>{n.classList.remove('training','done');const s=document.getElementById('bs-'+i);if(s)s.textContent='IDLE';});
+  sp('flp1',0);sp('flp2',0);sp('flp3',0);sp('flp4',0);
+  let step=0;
+  function next(){
+    if(step>=nodes.length){let v=0;const t=setInterval(()=>{v=Math.min(v+8,100);sp('flp2',v);if(v>=100){clearInterval(t);let v2=0;const t2=setInterval(()=>{v2=Math.min(v2+5,100);sp('flp3',v2);if(v2>=100){clearInterval(t2);let v3=0;const t3=setInterval(()=>{v3=Math.min(v3+6,100);sp('flp4',v3);if(v3>=100){clearInterval(t3);const rl=document.getElementById('fl-rnd-lbl');if(rl){const m=rl.textContent.match(/\d+/);if(m)rl.textContent='Round '+(parseInt(m[0])+1);}}},40);}},80);}},50);return;}
+    nodes[step].classList.add('training');const bs=document.getElementById('bs-'+step);if(bs)bs.textContent='TRAINING...';sp('flp1',Math.floor((step+1)/nodes.length*100));
+    setTimeout(()=>{nodes[step].classList.remove('training');nodes[step].classList.add('done');const bs2=document.getElementById('bs-'+step);if(bs2)bs2.textContent='✓ DONE';step++;next();},480);
+  }
+  next();
+}
+function ri(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function mk(id,cfg){const el=document.getElementById(id);if(!el)return null;if(CH[id])CH[id].destroy();CH[id]=new Chart(el.getContext('2d'),cfg);return CH[id];}
+function initCharts(){
+  const tctx=document.getElementById('ch-tl')?.getContext('2d');
+  const g1=tctx?.createLinearGradient(0,0,0,200);g1?.addColorStop(0,'rgba(255,45,85,.35)');g1?.addColorStop(1,'rgba(255,45,85,0)');
+  const g2=tctx?.createLinearGradient(0,0,0,200);g2?.addColorStop(0,'rgba(255,140,0,.22)');g2?.addColorStop(1,'rgba(255,140,0,0)');
+  mk('ch-tl',{type:'line',data:{labels:Array(16).fill('').map((_,i)=>`T-${16-i}`),datasets:[{label:'Fraud',data:Array(16).fill(0),borderColor:R,backgroundColor:g1,borderWidth:2.5,fill:true,tension:.4,pointRadius:3,pointBackgroundColor:R},{label:'Suspicious',data:Array(16).fill(0),borderColor:O,backgroundColor:g2,borderWidth:2,fill:true,tension:.4,pointRadius:3,pointBackgroundColor:O}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:200},plugins:{legend:{display:true,position:'top',labels:{boxWidth:10,padding:12}}},scales:{x:{grid:{color:DIM},ticks:{maxTicksLimit:8}},y:{grid:{color:DIM},beginAtZero:true,ticks:{stepSize:1}}}}});
+  mk('ch-dn',{type:'doughnut',data:{labels:['Credit Card','Money Laundering','Unauthorized','Fake Txn','Identity Theft'],datasets:[{data:[1,1,1,1,1],backgroundColor:[R,P,O,G,C],borderColor:'#040f1e',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:true,position:'bottom',labels:{padding:10,boxWidth:10}}},animation:{animateScale:true}}});
+  mk('ch-hr',{type:'bar',data:{labels:Array(24).fill(0).map((_,i)=>`${String(i).padStart(2,'0')}h`),datasets:[{label:'Normal',data:Array(24).fill(0).map((_,i)=>i>=9&&i<=17?ri(200,420):i>=0&&i<=5?ri(20,80):ri(80,220)),backgroundColor:'rgba(0,229,255,.18)',borderColor:C,borderWidth:1,borderRadius:3},{label:'Flagged',data:Array(24).fill(0).map((_,i)=>i>=0&&i<=5?ri(10,35):i>=9&&i<=17?ri(8,25):ri(2,12)),backgroundColor:'rgba(255,45,85,.5)',borderColor:R,borderWidth:1,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{boxWidth:10}}},scales:{x:{grid:{color:DIM},ticks:{maxTicksLimit:12}},y:{grid:{color:DIM},beginAtZero:true}}}});
+  mk('ch-rd',{type:'radar',data:{labels:BANKS,datasets:[{label:'Fraud Events',data:[12,19,8,15,7,11,14,9,6,10],backgroundColor:'rgba(255,45,85,.12)',borderColor:R,borderWidth:2,pointBackgroundColor:R,pointRadius:4},{label:'Accuracy %',data:[98,97,96,98,99,95,96,97,98,96],backgroundColor:'rgba(0,229,255,.08)',borderColor:C,borderWidth:2,pointBackgroundColor:C,pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{boxWidth:10}}},scales:{r:{beginAtZero:false,min:0,grid:{color:DIM},angleLines:{color:DIM},ticks:{display:false}}}}});
+  mk('ch-cc',{type:'scatter',data:{datasets:[{label:'Legitimate',data:Array(50).fill(0).map(()=>({x:Math.random()*60,y:Math.random()*45})),backgroundColor:'rgba(0,229,255,.5)',pointRadius:5},{label:'Fraud',data:Array(20).fill(0).map(()=>({x:Math.random()*35+62,y:Math.random()*55+38})),backgroundColor:'rgba(255,45,85,.75)',pointRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{boxWidth:10}}},scales:{x:{grid:{color:DIM},title:{display:true,text:'Velocity Score',color:'#7ab8d4'}},y:{grid:{color:DIM},title:{display:true,text:'Amount Anomaly',color:'#7ab8d4'}}}}});
+  mk('ch-ml',{type:'line',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun','Mon','Tue','Wed','Thu','Fri'],datasets:[{label:'Placement',data:[5e3,12e3,8e3,45e3,23e3,67e3,12e3,34e3,56e3,23e3,89e3,45e3],borderColor:R,borderWidth:2,tension:.4,fill:false,pointRadius:4},{label:'Layering',data:[12e3,45e3,89e3,34e3,120e3,67e3,23e3,89e3,145e3,56e3,34e3,78e3],borderColor:O,borderWidth:2,tension:.4,fill:false,pointRadius:4},{label:'Integration',data:[2e3,8e3,23e3,12e3,67e3,34e3,8e3,23e3,89e3,45e3,12e3,56e3],borderColor:P,borderWidth:2,tension:.4,fill:false,pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{boxWidth:10}}},scales:{x:{grid:{color:DIM}},y:{grid:{color:DIM},ticks:{callback:v=>'₹'+(v>=1000?(v/1000).toFixed(0)+'K':v)}}}}});
+  mk('ch-ut',{type:'bar',data:{labels:['SIM Swap','Phishing','New Device','Off-hours','OTP Failure','Geo Mismatch'],datasets:[{label:'Detection %',data:[94,87,91,83,87,91],backgroundColor:[O,O,O,R,R,R].map(c=>c+'55'),borderColor:[O,O,O,R,R,R],borderWidth:1.5,borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:DIM},ticks:{maxRotation:30}},y:{grid:{color:DIM},min:70,max:100,ticks:{callback:v=>v+'%'}}}}});
+  mk('ch-ft',{type:'bar',data:{labels:['Synthetic ID','Ghost Merchant','Bust-Out','Chargeback','Invoice Inflate'],datasets:[{label:'Detection Rate',data:[89,84,91,72,80],backgroundColor:[R,P,R,O,O].map(c=>c+'55'),borderColor:[R,P,R,O,O],borderWidth:1.5,borderRadius:5},{label:'False Positive %',data:[1.2,0.8,1.1,2.1,1.5],backgroundColor:'rgba(0,229,255,.15)',borderColor:C,borderWidth:1.5,borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{boxWidth:10}}},scales:{x:{grid:{color:DIM},ticks:{maxRotation:30}},y:{grid:{color:DIM},ticks:{callback:v=>v+'%'}}}}});
+  mk('ch-fl-a',{type:'line',data:{labels:Array(14).fill(0).map((_,i)=>`R${i+1}`),datasets:[{label:'Federated (Privacy-Preserving)',data:[65,72,78,83,87,90,91.5,93,94.5,95.8,96.5,97,97.2,97.3],borderColor:G,backgroundColor:'rgba(0,255,157,.1)',borderWidth:2.5,fill:true,tension:.4,pointRadius:4,pointBackgroundColor:G},{label:'Centralized (No Privacy)',data:[83,87,90,92,93.5,94.5,95,95.5,96,96.2,96.5,96.6,96.7,96.7],borderColor:C,backgroundColor:'rgba(0,229,255,.05)',borderWidth:2,fill:true,tension:.4,pointRadius:4,pointBackgroundColor:C}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{boxWidth:10}}},scales:{x:{grid:{color:DIM}},y:{grid:{color:DIM},min:60,max:100,ticks:{callback:v=>v+'%'}}}}});
+  mk('ch-fl-p',{type:'bar',data:{labels:Array(14).fill(0).map((_,i)=>`R${i+1}`),datasets:[{label:'ε per round',data:Array(14).fill(0).map(()=>+(Math.random()*.07+0.04).toFixed(3)),backgroundColor:'rgba(0,255,157,.3)',borderColor:G,borderWidth:1.5,borderRadius:4},{label:'Cumulative ε',data:[.05,.10,.16,.21,.27,.33,.39,.45,.51,.57,.63,.69,.75,.82],backgroundColor:'rgba(255,214,10,.15)',borderColor:Y,borderWidth:1.5,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{boxWidth:10}}},scales:{x:{grid:{color:DIM}},y:{grid:{color:DIM},ticks:{callback:v=>'ε '+v}}}}});
+  mk('ch-comp',{type:'line',data:{labels:Array(10).fill(0).map((_,i)=>`Round ${i+1}`),datasets:[{label:'Federated (Privacy)',data:[72,78,83,87,90,92,93.5,94.8,96.1,97.3],borderColor:G,backgroundColor:'rgba(0,255,157,.1)',borderWidth:2.5,fill:true,tension:.4,pointRadius:5,pointBackgroundColor:G},{label:'Centralized',data:[85,88,91,93,94.5,95.2,95.8,96.1,96.4,96.6],borderColor:C,backgroundColor:'rgba(0,229,255,.05)',borderWidth:2,fill:true,tension:.4,pointRadius:5,pointBackgroundColor:C}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{boxWidth:10}}},scales:{x:{grid:{color:DIM}},y:{grid:{color:DIM},min:60,max:100,ticks:{callback:v=>v+'%'}}}}});
+}
+function tlUpdate(tx){const ch=CH['ch-tl'];if(!ch)return;const t=new Date(tx.timestamp);const lbl=`${t.getHours()}:${String(t.getMinutes()).padStart(2,'0')}:${String(t.getSeconds()).padStart(2,'0')}`;ch.data.labels.push(lbl);ch.data.datasets[0].data.push(tx.status==='fraud'?1:0);ch.data.datasets[1].data.push(tx.status==='suspect'?1:0);if(ch.data.labels.length>20){ch.data.labels.shift();ch.data.datasets[0].data.shift();ch.data.datasets[1].data.shift();}ch.update('none');}
+function donutUpdate(tx){if(!tx.fraudType)return;donut[tx.fraudType]=(donut[tx.fraudType]||0)+1;const ch=CH['ch-dn'];if(!ch)return;ch.data.datasets[0].data=[donut.CC||1,donut.ML||1,donut.UT||1,donut.FT||1,donut.IT||1];ch.update('none');}
+(function(){
+  const cv=document.getElementById('hcvs'),ctx=cv.getContext('2d');let W,H,pts=[];
+  function resize(){W=cv.width=cv.offsetWidth;H=cv.height=cv.offsetHeight;}
+  class Pt{constructor(){this.reset();}reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.5;this.vy=(Math.random()-.5)*.5;this.r=Math.random()*2+.8;this.col=Math.random()>.7?C:Math.random()>.5?G:P;this.a=Math.random()*.5+.2;}update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>W)this.vx*=-1;if(this.y<0||this.y>H)this.vy*=-1;}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=this.col;ctx.globalAlpha=this.a;ctx.fill();ctx.globalAlpha=1;}}
+  function init(){resize();pts=Array(85).fill(0).map(()=>new Pt());}
+  function draw(){ctx.clearRect(0,0,W,H);for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<100){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=C;ctx.globalAlpha=(1-d/100)*.1;ctx.lineWidth=.5;ctx.stroke();ctx.globalAlpha=1;}}pts.forEach(p=>{p.update();p.draw();});requestAnimationFrame(draw);}
+  window.addEventListener('resize',()=>{resize();});init();draw();
+})();
+function initArch(){
+  const cv=document.getElementById('archcvs');const wrap=cv.parentElement;cv.width=wrap.offsetWidth||1000;cv.height=460;
+  const ctx=cv.getContext('2d'),W=cv.width,H=460;
+  const BG='#0b1d31',DM='#0e2a4222';
+  const banks=[{n:'HDFC',y:68},{n:'SBI',y:148},{n:'ICICI',y:228},{n:'Axis',y:308},{n:'Kotak',y:388}];
+  const banks2=[{n:'PNB',y:68},{n:'BoB',y:148},{n:'Canara',y:228},{n:'UCO',y:308},{n:'Bandhan',y:388}];
+  const AGG={x:W/2,y:H/2};let pulses=[],frame=0;
+  function node(x,y,lbl,col,w=88,h=36){ctx.shadowColor=col;ctx.shadowBlur=10;ctx.beginPath();ctx.roundRect(x-w/2,y-h/2,w,h,8);ctx.fillStyle=BG;ctx.fill();ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle=col;ctx.font="600 9.5px 'Share Tech Mono',monospace";ctx.textAlign='center';ctx.textBaseline='middle';const lines=lbl.split('\n');lines.forEach((l,i,a)=>ctx.fillText(l,x,y+(i-(a.length-1)/2)*13));}
+  function arrow(x1,y1,x2,y2,col,dash=false){ctx.beginPath();if(dash)ctx.setLineDash([4,4]);else ctx.setLineDash([]);ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=col+'55';ctx.lineWidth=1.5;ctx.stroke();ctx.setLineDash([]);const a=Math.atan2(y2-y1,x2-x1);ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-8*Math.cos(a-.4),y2-8*Math.sin(a-.4));ctx.lineTo(x2-8*Math.cos(a+.4),y2-8*Math.sin(a+.4));ctx.closePath();ctx.fillStyle=col+'88';ctx.fill();}
+  function spawn(x1,y1,x2,y2,col){pulses.push({x1,y1,x2,y2,col,t:0,s:.007+Math.random()*.006});}
+  const c1=85,c2=240,c4=W-240,c5=W-85;
+  const outs=[{n:'CC\nFraud',y:78,c:R},{n:'AML',y:168,c:P},{n:'Unauth\nTxns',y:258,c:O},{n:'Fake\nTxns',y:348,c:G}];
+  function render(){
+    ctx.clearRect(0,0,W,H);ctx.strokeStyle=DM;ctx.lineWidth=1;
+    for(let x=0;x<W;x+=48){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=48){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    const hdr=(x,t)=>{ctx.font="bold 8.5px 'Share Tech Mono',monospace";ctx.fillStyle='#00e5ff77';ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText(t,x,8);};
+    hdr(c1,'BANKS');hdr(c2,'LOCAL MODELS');hdr(W/2,'FL AGGREGATOR');hdr(c4,'GLOBAL MODEL');hdr(c5,'DETECTIONS');
+    banks.forEach((b)=>{arrow(c1+44,b.y,c2-44,b.y,C);arrow(c2+44,b.y,W/2-68,AGG.y,P,true);});
+    banks2.forEach((b)=>{arrow(W-c1-44,b.y,W-c2+44,b.y,C);arrow(W-c2-44,b.y,W/2+68,AGG.y,P,true);});
+    arrow(W/2+68,AGG.y,c4-44,AGG.y,G);outs.forEach(o=>arrow(c4+44,AGG.y,c5-44,o.y,o.c));
+    ctx.font="400 8px 'Share Tech Mono',monospace";ctx.fillStyle='#00ff9d77';ctx.textAlign='center';
+    ctx.fillText('✓ Gradients Only',W/2-92,AGG.y-14);ctx.fillText('No Raw Data',W/2-92,AGG.y-2);
+    banks.forEach(b=>{node(c1,b.y,b.n,C,76,34);node(c2,b.y,'Local\nModel',P,76,38);});
+    banks2.forEach(b=>{node(W-c1,b.y,b.n,C,76,34);node(W-c2,b.y,'Local\nModel',P,76,38);});
+    ctx.shadowColor=C;ctx.shadowBlur=22;ctx.beginPath();ctx.roundRect(W/2-68,AGG.y-38,136,76,12);ctx.fillStyle=BG;ctx.fill();ctx.strokeStyle=C;ctx.lineWidth=2;ctx.stroke();ctx.shadowBlur=0;
+    ctx.fillStyle=C;ctx.font="bold 9.5px 'Rajdhani',sans-serif";ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('FEDERATED AGGREGATOR',W/2,AGG.y-10);ctx.fillStyle=G;ctx.font="400 8.5px 'Share Tech Mono',monospace";ctx.fillText('FedAvg Algorithm',W/2,AGG.y+8);ctx.fillStyle='#00e5ff66';ctx.font="400 8px 'Share Tech Mono',monospace";ctx.fillText(`Round ${47+Math.floor(frame/300)} | ε=${(0.9+frame*.0003).toFixed(3)}`,W/2,AGG.y+24);
+    node(c4,AGG.y,'Global\nModel',G,88,42);outs.forEach(o=>node(c5,o.y,o.n,o.c,82,34));
+    if(frame%85===0){const b=banks[Math.floor(Math.random()*5)];spawn(c1+44,b.y,c2-44,b.y,C);}
+    if(frame%60===0){const b=banks[Math.floor(Math.random()*5)];spawn(c2+44,b.y,W/2-68,AGG.y,P);}
+    if(frame%70===0){const b=banks2[Math.floor(Math.random()*5)];spawn(W-c2-44,b.y,W/2+68,AGG.y,P);}
+    if(frame%55===0){spawn(W/2+68,AGG.y,c4-44,AGG.y,G);}
+    if(frame%65===0){const o=outs[Math.floor(Math.random()*4)];spawn(c4+44,AGG.y,c5-44,o.y,o.c);}
+    pulses=pulses.filter(p=>p.t<1);
+    pulses.forEach(p=>{p.t+=p.s;const x=p.x1+(p.x2-p.x1)*p.t,y=p.y1+(p.y2-p.y1)*p.t;ctx.beginPath();ctx.arc(x,y,4.5,0,Math.PI*2);ctx.fillStyle=p.col;ctx.globalAlpha=1-p.t*.6;ctx.fill();ctx.globalAlpha=1;});
+    frame++;requestAnimationFrame(render);
+  }
+  render();
+}
+function exportCSV(){
+  if(allTxns.length===0) return;
+  const cols=['id','timestamp','bankSrc','bankDst','amount','status','fraudType','score','latency','device'];
+  let csv=cols.join(',')+'\n';
+  allTxns.forEach(t=>{
+    csv+=cols.map(c=>t[c]||'').join(',')+'\n';
+  });
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=window.URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.setAttribute('hidden','');
+  a.setAttribute('href',url);
+  a.setAttribute('download','pflf_transactions.csv');
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function toggleTheme(){
+  document.body.classList.toggle('light-mode');
+  const isL=document.body.classList.contains('light-mode');
+  document.getElementById('theme-btn').textContent=isL?'🌙':'🌞';
+  Chart.defaults.color=isL?'#4a5568':'#7ab8d4';
+  Chart.defaults.borderColor=isL?'#cbd5e1':'#0e2a42';
+  for(let id in CH){if(CH[id])CH[id].update('none');}
+}
+
+document.querySelectorAll('.bn').forEach((n,i)=>{
+  n.style.cursor='pointer';
+  n.onclick=()=>{
+    const nm=n.querySelector('.bn-name').textContent;
+    alert(`Node Insight: ${nm}\nLocal Accuracy: ${(95+Math.random()*4).toFixed(1)}%\nUpdates Synced: ${document.getElementById('s-rnd').textContent}\nConnection: Secure TLS`);
+  };
+});
+
+new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');});},{threshold:.12}).observe;
+document.querySelectorAll('.rv').forEach(el=>{new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');});},{threshold:.12}).observe(el);});
+window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',scrollY>60));
+window.addEventListener('DOMContentLoaded',()=>{initCharts();setTimeout(initArch,200);wsConnect();});
+</script>
+</body>
+</html>

@@ -1,0 +1,281 @@
+﻿main.py:24:1: E302 expected 2 blank lines, found 1
+main.py:34:1: E302 expected 2 blank lines, found 1
+main.py:39:1: W293 blank line contains whitespace
+main.py:42:1: W293 blank line contains whitespace
+main.py:46:1: W293 blank line contains whitespace
+main.py:50:41: W291 trailing whitespace
+main.py:59:1: W293 blank line contains whitespace
+main.py:63:1: E302 expected 2 blank lines, found 1
+main.py:68:1: W293 blank line contains whitespace
+main.py:89:1: E302 expected 2 blank lines, found 1
+main.py:93:1: W293 blank line contains whitespace
+main.py:96:33: W291 trailing whitespace
+main.py:99:1: W293 blank line contains whitespace
+main.py:126:80: E501 line too long (80 > 79 characters)
+main.py:130:80: E501 line too long (90 > 79 characters)
+main.py:131:80: E501 line too long (128 > 79 characters)
+main.py:132:80: E501 line too long (121 > 79 characters)
+main.py:133:80: E501 line too long (88 > 79 characters)
+main.py:134:80: E501 line too long (128 > 79 characters)
+main.py:135:80: E501 line too long (128 > 79 characters)
+main.py:136:80: E501 line too long (88 > 79 characters)
+main.py:137:80: E501 line too long (88 > 79 characters)
+models/detector.py:1:1: F401 'math' imported but unused
+models/detector.py:5:80: E501 line too long (91 > 79 characters)
+models/detector.py:7:80: E501 line too long (116 > 79 characters)
+models/detector.py:10:1: E302 expected 2 blank lines, found 1
+models/detector.py:13:1: E302 expected 2 blank lines, found 1
+models/detector.py:16:1: E302 expected 2 blank lines, found 1
+models/detector.py:19:1: E302 expected 2 blank lines, found 1
+models/detector.py:24:1: E305 expected 2 blank lines after class or function definition, found 1
+models/detector.py:24:17: E201 whitespace after '{'
+models/detector.py:24:22: E231 missing whitespace after ':'
+models/detector.py:24:30: E231 missing whitespace after ':'
+models/detector.py:24:39: E231 missing whitespace after ':'
+models/detector.py:24:48: E231 missing whitespace after ':'
+models/detector.py:24:57: E231 missing whitespace after ':'
+models/detector.py:24:66: E231 missing whitespace after ':'
+models/detector.py:24:75: E231 missing whitespace after ':'
+models/detector.py:24:78: E202 whitespace before '}'
+models/detector.py:26:1: E302 expected 2 blank lines, found 1
+models/detector.py:29:1: E302 expected 2 blank lines, found 1
+models/detector.py:36:1: E302 expected 2 blank lines, found 1
+models/detector.py:45:1: E302 expected 2 blank lines, found 1
+models/detector.py:46:29: E701 multiple statements on one line (colon)
+models/detector.py:47:28: E701 multiple statements on one line (colon)
+models/detector.py:52:1: E302 expected 2 blank lines, found 1
+models/detector.py:53:8: E221 multiple spaces before operator
+models/detector.py:54:9: E221 multiple spaces before operator
+models/detector.py:55:8: E221 multiple spaces before operator
+models/detector.py:56:12: E221 multiple spaces before operator
+models/detector.py:57:11: E221 multiple spaces before operator
+models/detector.py:61:8: E221 multiple spaces before operator
+models/detector.py:67:80: E501 line too long (109 > 79 characters)
+models/detector.py:69:10: E221 multiple spaces before operator
+models/detector.py:69:80: E501 line too long (105 > 79 characters)
+models/detector.py:70:80: E501 line too long (131 > 79 characters)
+models/detector.py:73:80: E501 line too long (174 > 79 characters)
+models/detector.py:74:80: E501 line too long (126 > 79 characters)
+models/detector.py:75:80: E501 line too long (112 > 79 characters)
+models/detector.py:76:80: E501 line too long (104 > 79 characters)
+models/detector.py:80:80: E501 line too long (239 > 79 characters)
+models/detector.py:81:80: E501 line too long (204 > 79 characters)
+models/detector.py:82:80: E501 line too long (154 > 79 characters)
+models/detector.py:83:80: E501 line too long (137 > 79 characters)
+models/detector.py:89:35: E201 whitespace after '{'
+models/detector.py:89:80: E501 line too long (147 > 79 characters)
+models/detector.py:89:145: E202 whitespace before '}'
+models/detector.py:90:35: E201 whitespace after '{'
+models/detector.py:90:80: E501 line too long (146 > 79 characters)
+models/detector.py:90:144: E202 whitespace before '}'
+models/detector.py:91:35: E201 whitespace after '{'
+models/detector.py:91:80: E501 line too long (169 > 79 characters)
+models/detector.py:91:167: E202 whitespace before '}'
+models/detector.py:92:35: E201 whitespace after '{'
+models/detector.py:92:80: E501 line too long (159 > 79 characters)
+models/detector.py:92:157: E202 whitespace before '}'
+models/detector.py:93:35: E201 whitespace after '{'
+models/detector.py:93:80: E501 line too long (141 > 79 characters)
+models/detector.py:93:139: E202 whitespace before '}'
+models/detector.py:94:35: E201 whitespace after '{'
+models/detector.py:94:80: E501 line too long (165 > 79 characters)
+models/detector.py:94:164: E202 whitespace before '}'
+models/detector.py:96:21: E201 whitespace after '{'
+models/detector.py:96:80: E501 line too long (106 > 79 characters)
+models/detector.py:96:105: E202 whitespace before '}'
+models/detector.py:103:8: E221 multiple spaces before operator
+models/detector.py:104:8: E221 multiple spaces before operator
+models/detector.py:105:8: E221 multiple spaces before operator
+models/detector.py:107:10: E221 multiple spaces before operator
+models/detector.py:108:10: E221 multiple spaces before operator
+models/detector.py:109:11: E221 multiple spaces before operator
+models/detector.py:111:9: E221 multiple spaces before operator
+models/detector.py:111:80: E501 line too long (80 > 79 characters)
+models/detector.py:112:9: E221 multiple spaces before operator
+models/detector.py:113:9: E221 multiple spaces before operator
+models/detector.py:114:9: E221 multiple spaces before operator
+models/detector.py:115:11: E221 multiple spaces before operator
+models/detector.py:116:11: E221 multiple spaces before operator
+models/detector.py:119:80: E501 line too long (131 > 79 characters)
+models/detector.py:121:10: E221 multiple spaces before operator
+models/detector.py:121:80: E501 line too long (105 > 79 characters)
+models/detector.py:122:80: E501 line too long (141 > 79 characters)
+models/detector.py:125:80: E501 line too long (207 > 79 characters)
+models/detector.py:126:80: E501 line too long (132 > 79 characters)
+models/detector.py:127:80: E501 line too long (118 > 79 characters)
+models/detector.py:128:80: E501 line too long (87 > 79 characters)
+models/detector.py:132:80: E501 line too long (241 > 79 characters)
+models/detector.py:133:80: E501 line too long (204 > 79 characters)
+models/detector.py:134:80: E501 line too long (157 > 79 characters)
+models/detector.py:135:80: E501 line too long (125 > 79 characters)
+models/detector.py:141:36: E201 whitespace after '{'
+models/detector.py:141:80: E501 line too long (161 > 79 characters)
+models/detector.py:141:159: E202 whitespace before '}'
+models/detector.py:142:36: E201 whitespace after '{'
+models/detector.py:142:80: E501 line too long (163 > 79 characters)
+models/detector.py:142:161: E202 whitespace before '}'
+models/detector.py:143:36: E201 whitespace after '{'
+models/detector.py:143:80: E501 line too long (165 > 79 characters)
+models/detector.py:143:163: E202 whitespace before '}'
+models/detector.py:144:36: E201 whitespace after '{'
+models/detector.py:144:80: E501 line too long (156 > 79 characters)
+models/detector.py:144:154: E202 whitespace before '}'
+models/detector.py:145:36: E201 whitespace after '{'
+models/detector.py:145:80: E501 line too long (149 > 79 characters)
+models/detector.py:145:147: E202 whitespace before '}'
+models/detector.py:146:36: E201 whitespace after '{'
+models/detector.py:146:80: E501 line too long (179 > 79 characters)
+models/detector.py:146:177: E202 whitespace before '}'
+models/detector.py:147:36: E201 whitespace after '{'
+models/detector.py:147:80: E501 line too long (185 > 79 characters)
+models/detector.py:147:184: E202 whitespace before '}'
+models/detector.py:149:21: E201 whitespace after '{'
+models/detector.py:149:80: E501 line too long (106 > 79 characters)
+models/detector.py:149:105: E202 whitespace before '}'
+models/detector.py:156:8: E221 multiple spaces before operator
+models/detector.py:157:9: E221 multiple spaces before operator
+models/detector.py:158:8: E221 multiple spaces before operator
+models/detector.py:159:12: E225 missing whitespace around operator
+models/detector.py:162:8: E221 multiple spaces before operator
+models/detector.py:163:9: E221 multiple spaces before operator
+models/detector.py:164:8: E221 multiple spaces before operator
+models/detector.py:166:9: E221 multiple spaces before operator
+models/detector.py:167:8: E221 multiple spaces before operator
+models/detector.py:168:9: E221 multiple spaces before operator
+models/detector.py:169:9: E221 multiple spaces before operator
+models/detector.py:170:9: E221 multiple spaces before operator
+models/detector.py:171:9: E221 multiple spaces before operator
+models/detector.py:172:9: E221 multiple spaces before operator
+models/detector.py:174:9: E221 multiple spaces before operator
+models/detector.py:181:10: E221 multiple spaces before operator
+models/detector.py:181:80: E501 line too long (105 > 79 characters)
+models/detector.py:182:80: E501 line too long (148 > 79 characters)
+models/detector.py:185:80: E501 line too long (206 > 79 characters)
+models/detector.py:186:80: E501 line too long (168 > 79 characters)
+models/detector.py:187:80: E501 line too long (100 > 79 characters)
+models/detector.py:188:80: E501 line too long (84 > 79 characters)
+models/detector.py:192:80: E501 line too long (295 > 79 characters)
+models/detector.py:193:80: E501 line too long (208 > 79 characters)
+models/detector.py:194:80: E501 line too long (150 > 79 characters)
+models/detector.py:195:80: E501 line too long (112 > 79 characters)
+models/detector.py:201:38: E201 whitespace after '{'
+models/detector.py:201:80: E501 line too long (180 > 79 characters)
+models/detector.py:201:178: E202 whitespace before '}'
+models/detector.py:202:38: E201 whitespace after '{'
+models/detector.py:202:80: E501 line too long (156 > 79 characters)
+models/detector.py:202:154: E202 whitespace before '}'
+models/detector.py:203:38: E201 whitespace after '{'
+models/detector.py:203:80: E501 line too long (160 > 79 characters)
+models/detector.py:203:158: E202 whitespace before '}'
+models/detector.py:204:38: E201 whitespace after '{'
+models/detector.py:204:80: E501 line too long (174 > 79 characters)
+models/detector.py:204:172: E202 whitespace before '}'
+models/detector.py:205:38: E201 whitespace after '{'
+models/detector.py:205:80: E501 line too long (186 > 79 characters)
+models/detector.py:205:184: E202 whitespace before '}'
+models/detector.py:206:38: E201 whitespace after '{'
+models/detector.py:206:80: E501 line too long (168 > 79 characters)
+models/detector.py:206:166: E202 whitespace before '}'
+models/detector.py:207:38: E201 whitespace after '{'
+models/detector.py:207:80: E501 line too long (182 > 79 characters)
+models/detector.py:207:181: E202 whitespace before '}'
+models/detector.py:209:21: E201 whitespace after '{'
+models/detector.py:209:80: E501 line too long (106 > 79 characters)
+models/detector.py:209:105: E202 whitespace before '}'
+models/detector.py:216:8: E221 multiple spaces before operator
+models/detector.py:217:8: E221 multiple spaces before operator
+models/detector.py:218:7: E221 multiple spaces before operator
+models/detector.py:219:7: E221 multiple spaces before operator
+models/detector.py:220:10: E221 multiple spaces before operator
+models/detector.py:221:10: E221 multiple spaces before operator
+models/detector.py:222:9: E221 multiple spaces before operator
+models/detector.py:223:9: E221 multiple spaces before operator
+models/detector.py:225:9: E221 multiple spaces before operator
+models/detector.py:226:9: E221 multiple spaces before operator
+models/detector.py:227:8: E221 multiple spaces before operator
+models/detector.py:228:8: E221 multiple spaces before operator
+models/detector.py:231:10: E221 multiple spaces before operator
+models/detector.py:232:10: E221 multiple spaces before operator
+models/detector.py:239:10: E221 multiple spaces before operator
+models/detector.py:239:80: E501 line too long (105 > 79 characters)
+models/detector.py:240:80: E501 line too long (141 > 79 characters)
+models/detector.py:243:80: E501 line too long (231 > 79 characters)
+models/detector.py:244:80: E501 line too long (172 > 79 characters)
+models/detector.py:245:80: E501 line too long (133 > 79 characters)
+models/detector.py:246:80: E501 line too long (110 > 79 characters)
+models/detector.py:250:80: E501 line too long (242 > 79 characters)
+models/detector.py:251:80: E501 line too long (176 > 79 characters)
+models/detector.py:252:80: E501 line too long (168 > 79 characters)
+models/detector.py:253:80: E501 line too long (127 > 79 characters)
+models/detector.py:259:40: E201 whitespace after '{'
+models/detector.py:259:80: E501 line too long (188 > 79 characters)
+models/detector.py:259:186: E202 whitespace before '}'
+models/detector.py:260:40: E201 whitespace after '{'
+models/detector.py:260:80: E501 line too long (183 > 79 characters)
+models/detector.py:260:181: E202 whitespace before '}'
+models/detector.py:261:40: E201 whitespace after '{'
+models/detector.py:261:80: E501 line too long (223 > 79 characters)
+models/detector.py:261:221: E202 whitespace before '}'
+models/detector.py:262:40: E201 whitespace after '{'
+models/detector.py:262:80: E501 line too long (221 > 79 characters)
+models/detector.py:262:219: E202 whitespace before '}'
+models/detector.py:263:40: E201 whitespace after '{'
+models/detector.py:263:80: E501 line too long (206 > 79 characters)
+models/detector.py:263:204: E202 whitespace before '}'
+models/detector.py:264:40: E201 whitespace after '{'
+models/detector.py:264:80: E501 line too long (210 > 79 characters)
+models/detector.py:264:208: E202 whitespace before '}'
+models/detector.py:265:40: E201 whitespace after '{'
+models/detector.py:265:80: E501 line too long (205 > 79 characters)
+models/detector.py:265:203: E202 whitespace before '}'
+models/detector.py:266:40: E201 whitespace after '{'
+models/detector.py:266:80: E501 line too long (202 > 79 characters)
+models/detector.py:266:201: E202 whitespace before '}'
+models/detector.py:268:21: E201 whitespace after '{'
+models/detector.py:268:80: E501 line too long (106 > 79 characters)
+models/detector.py:268:105: E202 whitespace before '}'
+models/detector.py:282:21: E221 multiple spaces before operator
+models/detector.py:284:21: E221 multiple spaces before operator
+models/detector.py:287:16: E221 multiple spaces before operator
+models/detector.py:288:18: E225 missing whitespace around operator
+models/detector.py:289:18: E225 missing whitespace around operator
+models/detector.py:296:29: E231 missing whitespace after ','
+models/detector.py:296:34: E231 missing whitespace after ','
+models/detector.py:296:39: E231 missing whitespace after ','
+models/detector.py:296:44: E231 missing whitespace after ','
+models/detector.py:296:80: E501 line too long (82 > 79 characters)
+models/detector.py:297:13: E221 multiple spaces before operator
+models/detector.py:298:15: E221 multiple spaces before operator
+models/detector.py:299:1: W293 blank line contains whitespace
+models/detector.py:300:14: E221 multiple spaces before operator
+models/detector.py:300:80: E501 line too long (100 > 79 characters)
+models/detector.py:301:15: E221 multiple spaces before operator
+models/detector.py:304:19: E201 whitespace after '{'
+models/detector.py:304:24: E231 missing whitespace after ':'
+models/detector.py:304:50: E231 missing whitespace after ':'
+models/detector.py:304:75: E231 missing whitespace after ':'
+models/detector.py:304:80: E501 line too long (128 > 79 characters)
+models/detector.py:304:108: E231 missing whitespace after ':'
+models/detector.py:304:127: E202 whitespace before '}'
+models/detector.py:327:33: E701 multiple statements on one line (colon)
+models/detector.py:328:33: E701 multiple statements on one line (colon)
+models/detector.py:329:33: E701 multiple statements on one line (colon)
+models/detector.py:330:33: E701 multiple statements on one line (colon)
+models/detector.py:331:21: E701 multiple statements on one line (colon)
+models/detector.py:332:41: E701 multiple statements on one line (colon)
+models/detector.py:333:1: W293 blank line contains whitespace
+models/detector.py:334:80: E501 line too long (135 > 79 characters)
+routes/api.py:8:1: E302 expected 2 blank lines, found 1
+routes/api.py:25:1: E302 expected 2 blank lines, found 1
+routes/api.py:30:1: E302 expected 2 blank lines, found 1
+routes/api.py:41:1: E302 expected 2 blank lines, found 1
+routes/api.py:46:1: E302 expected 2 blank lines, found 1
+routes/api.py:50:80: E501 line too long (93 > 79 characters)
+routes/api.py:54:1: E302 expected 2 blank lines, found 1
+routes/api.py:58:80: E501 line too long (93 > 79 characters)
+routes/api.py:62:1: E302 expected 2 blank lines, found 1
+routes/api.py:66:80: E501 line too long (93 > 79 characters)
+routes/api.py:70:1: E302 expected 2 blank lines, found 1
+routes/api.py:74:80: E501 line too long (93 > 79 characters)
+routes/api.py:78:1: E302 expected 2 blank lines, found 1
+routes/api.py:84:80: E501 line too long (98 > 79 characters)
